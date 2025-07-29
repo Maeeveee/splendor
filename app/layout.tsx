@@ -4,8 +4,10 @@ import { GeistMono } from 'geist/font/mono'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'v0 App',
-  description: 'Created with v0',
+  title: 'Splendor jadi jadian',
+  icons: {
+    icon: '/diamond.png'},
+  description: 'Created with me & v0',
   generator: 'v0.dev',
 }
 
