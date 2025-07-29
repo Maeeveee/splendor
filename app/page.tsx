@@ -230,18 +230,19 @@ w-32 h-36 relative
 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105
 ${animatingCardId === card.id ? "animate-pulse ring-2 ring-green-400" : ""}
 ${isReserved ? "border-blue-400 border-2" : ""}
-${card.provides === "white"
-        ? "bg-gray-100"
-        : card.provides === "blue"
-          ? "bg-blue-100"
-          : card.provides === "green"
-            ? "bg-green-100"
-            : card.provides === "red"
-              ? "bg-red-100"
-              : card.provides === "black"
-                ? "bg-gray-700"
-                : ""
-      }
+${
+  card.provides === "white"
+    ? "bg-gray-100"
+    : card.provides === "blue"
+      ? "bg-blue-100"
+      : card.provides === "green"
+        ? "bg-green-100"
+        : card.provides === "red"
+          ? "bg-red-100"
+          : card.provides === "black"
+            ? "bg-gray-700"
+            : ""
+}
 `}
   >
     <CardHeader className="p-2 pb-1">
@@ -315,8 +316,9 @@ const NobleComponent = ({ noble, playerBonuses }: { noble: Noble; playerBonuses:
 
   return (
     <Card
-      className={`w-28 h-28 relative bg-gradient-to-br from-purple-50 to-indigo-50 shadow-lg flex flex-col items-center justify-center p-2 transition-all duration-300 hover:scale-105 ${canVisit ? "ring-2 ring-yellow-400" : "opacity-70"
-        }`}
+      className={`w-28 h-28 relative bg-gradient-to-br from-purple-50 to-indigo-50 shadow-lg flex flex-col items-center justify-center p-2 transition-all duration-300 hover:scale-105 ${
+        canVisit ? "ring-2 ring-yellow-400" : "opacity-70"
+      }`}
     >
       <Crown className="w-6 h-6 text-purple-600 mb-1" />
       <Badge variant="secondary" className="bg-yellow-100 text-yellow-800 border-yellow-300 text-xs px-1 py-0 mb-2">
@@ -390,12 +392,12 @@ const CardSlot = ({
 }
 
 // New: Deck Counter Component
-const DeckCounter = ({ count }: { count: number }) => (
+const DeckCounter = ({ tierName, count }: { tierName: string; count: number }) => (
   <Card className="w-32 h-36 relative shadow-lg bg-slate-800 text-white flex flex-col items-center justify-center p-2">
     {" "}
     {/* Changed w-28 to w-32, h-34 to h-36 */}
     <div className="text-3xl font-bold">{count}</div> {/* Changed text-4xl to text-3xl */}
-    <div className="text-sm mt-2 text-center">Kartu Tersisa</div>
+    <div className="text-sm mt-2 text-center">Kartu {tierName} Tersisa</div>
     <div className="absolute bottom-2 right-2">
       <Gem className="w-4 h-4 text-gray-400" />
     </div>
@@ -440,7 +442,7 @@ export default function SplendorGame() {
     const shuffled = [...array]
     for (let i = shuffled.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1))
-        ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+      ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
     }
     return shuffled
   }
@@ -569,6 +571,7 @@ export default function SplendorGame() {
   }
 
   // Refactored logic functions to return new state, not call setGameState
+  // Removed turn advancement from here
   const buyCardLogic = (
     prev: GameState,
     playerId: number,
@@ -590,7 +593,11 @@ export default function SplendorGame() {
     player.points += card.points
 
     const newAvailableCards = { ...newState.availableCards }
-    const newDecks = { ...newState.decks }
+    const newDecks = {
+      tier1: [...prev.decks.tier1], // Pastikan ini adalah salinan mendalam
+      tier2: [...prev.decks.tier2],
+      tier3: [...prev.decks.tier3],
+    }
 
     // Replace the bought card with a new one from the deck or null
     if (newDecks[tier].length > 0) {
@@ -621,6 +628,7 @@ export default function SplendorGame() {
     return newState
   }
 
+  // Removed turn advancement from here
   const buyReservedCardLogic = (prev: GameState, playerId: number, card: DevelopmentCard): GameState => {
     const newState = { ...prev }
     const players = [...newState.players]
@@ -658,6 +666,7 @@ export default function SplendorGame() {
   const getTotalGems = (playerGems: Record<GemColor | "gold", number>) =>
     GEM_COLORS.reduce((sum, color) => sum + playerGems[color], 0) + playerGems.gold
 
+  // Removed turn advancement from here
   const takeGemsLogic = (prev: GameState, playerId: number, selectedGems: Record<GemColor, number>): GameState => {
     const newState = { ...prev }
     const players = [...newState.players]
@@ -692,6 +701,7 @@ export default function SplendorGame() {
     return newState
   }
 
+  // Removed turn advancement from here
   const reserveCardLogic = (
     prev: GameState,
     playerId: number,
@@ -719,7 +729,11 @@ export default function SplendorGame() {
     newState.gems = newGemsSupply
 
     const newAvailableCards = { ...newState.availableCards }
-    const newDecks = { ...newState.decks }
+    const newDecks = {
+      tier1: [...prev.decks.tier1], // Pastikan ini adalah salinan mendalam
+      tier2: [...prev.decks.tier2],
+      tier3: [...prev.decks.tier3],
+    }
 
     // Replace the reserved card with a new one from the deck or null
     if (newDecks[tier].length > 0) {
@@ -735,6 +749,7 @@ export default function SplendorGame() {
     return newState
   }
 
+  // nextTurn function remains as a separate helper
   const nextTurn = () => {
     setGameState((prev) => ({
       ...prev,
@@ -756,7 +771,6 @@ export default function SplendorGame() {
     ]
 
     let stageIndex = 0
-
     setGameState((prev) => ({
       ...prev,
       botThinking: true,
@@ -777,7 +791,6 @@ export default function SplendorGame() {
 
     setTimeout(() => {
       clearInterval(thinkingInterval)
-
       setGameState((prev) => {
         if (prev.gameMode !== "pve" || prev.currentPlayer !== 1 || prev.winner || !prev.players[1]) {
           console.warn("Bot move aborted: Game state changed during thinking time.")
@@ -790,7 +803,6 @@ export default function SplendorGame() {
         }
 
         let currentBotState = { ...prev }
-        let actionTaken = false
         let botAction = ""
         const botPlayer = currentBotState.players[1]
 
@@ -816,7 +828,6 @@ export default function SplendorGame() {
           tier: keyof GameState["availableCards"]
           index: number
         }> // Filter out nulls
-
         const affordableCards = allAvailableCards.filter(({ card }) => canAffordCard(botPlayer, card))
         affordableCards.forEach(({ card, tier, index }) =>
           possibleActions.push({ type: "buyAvailable", card, tier, index }),
@@ -846,7 +857,6 @@ export default function SplendorGame() {
             color,
             need: Math.max(0, 3 - bonuses[color]),
           })).sort((a, b) => b.need - a.need) // Descending need
-
           const selected = { white: 0, blue: 0, green: 0, red: 0, black: 0 } as Record<GemColor, number>
           let count = 0
           for (const { color } of gemPriority) {
@@ -882,7 +892,6 @@ export default function SplendorGame() {
 
         // 2. Decide on an action
         let chosenAction: (typeof possibleActions)[number] | null = null
-
         const buyActions = possibleActions.filter(
           (a) => a.type === "buyReserved" || a.type === "buyAvailable",
         ) as Array<
@@ -896,7 +905,6 @@ export default function SplendorGame() {
 
         // Introduce a chance to deviate from optimal buying
         const randomDecisionChance = 0.35 // 35% chance to pick from non-buy actions if buy is available
-
         if (buyActions.length > 0 && Math.random() > randomDecisionChance) {
           // Prioritize buying: sort by points, then randomize among top ones
           buyActions.sort((a, b) => b.card.points - a.card.points)
@@ -953,7 +961,6 @@ export default function SplendorGame() {
               gemCollectSound.current?.play()
               break
           }
-          actionTaken = true
         } else {
           botAction = "Bot melewati giliran"
         }
@@ -971,7 +978,6 @@ export default function SplendorGame() {
         if (finalState.animatingCard !== null) {
           setTimeout(() => setGameState((current) => ({ ...current, animatingCard: null })), 500)
         }
-
         return finalState
       })
     }, 4000) // Total thinking time: 4 seconds
@@ -989,12 +995,9 @@ export default function SplendorGame() {
       const currentSelectedCount = newSelected[color]
       const currentPlayerGems = prev.players[prev.currentPlayer].gems
       const currentTotalPlayerGems = getTotalGems(currentPlayerGems)
-
       const totalSelectedBeforeClick = Object.values(newSelected).reduce((sum, val) => sum + val, 0)
       const differentColorsBeforeClick = Object.values(newSelected).filter((val) => val > 0).length
-
       let nextValue: number
-
       if (currentSelectedCount === 0) {
         // If currently 0, try to select 1
         nextValue = 1
@@ -1015,34 +1018,27 @@ export default function SplendorGame() {
         // If currently 2, deselect
         nextValue = 0
       }
-
       // Calculate potential new state for validation
       const tempSelected = { ...newSelected, [color]: nextValue }
       const totalSelectedAfterClick = Object.values(tempSelected).reduce((sum, val) => sum + val, 0)
       const differentColorsAfterClick = Object.values(tempSelected).filter((val) => val > 0).length
-
       // Validation for adding gems (if nextValue > 0)
       if (nextValue > 0) {
         // Rule 3: Cannot take more than 3 total gems
         if (totalSelectedAfterClick > 3) return prev
-
         // Rule 4: Cannot take 2 of the same color if supply < 4
         if (nextValue === 2 && prev.gems[color] < 4) return prev
-
         // Rule 5: Cannot take permata lebih dari yang tersedia di persediaan
         if (nextValue > prev.gems[color]) return prev
-
         // Rule 2: If taking 2 of the same color, cannot take other gems
         // This means if nextValue is 2, differentColorsAfterClick must be 1
         if (nextValue === 2 && differentColorsAfterClick > 1) return prev
-
         // New Rule: Player cannot have more than 10 total gems after taking
         const netChangeForThisColor = nextValue - currentSelectedCount
         if (currentTotalPlayerGems + netChangeForThisColor > 10) {
           return prev
         }
       }
-
       // If all validations pass, update selected gems
       newSelected[color] = nextValue
       return { ...prev, selectedGems: newSelected }
@@ -1052,16 +1048,13 @@ export default function SplendorGame() {
   const canTakeSelectedGems = () => {
     const totalSelected = Object.values(gameState.selectedGems).reduce((sum, val) => sum + val, 0)
     const differentColors = Object.values(gameState.selectedGems).filter((val) => val > 0).length
-
     if (totalSelected === 0) return false
     if (totalSelected > 3) return false
-
     // Check if taking 2 of same color
     const twoOfSameColor = Object.entries(gameState.selectedGems).find(([_, count]) => count === 2)
     if (twoOfSameColor) {
       return differentColors === 1 && gameState.gems[twoOfSameColor[0] as GemColor] >= 4
     }
-
     // Otherwise, must be taking different colors (max 3)
     return differentColors <= 3 && totalSelected <= 3
   }
@@ -1087,13 +1080,11 @@ export default function SplendorGame() {
               <CardTitle className="text-4xl font-bold mb-2">Splendor</CardTitle>
               <p className="text-slate-300 text-lg">Permainan Pedagang Renaissance</p>
             </CardHeader>
-
             <CardContent className="p-8 space-y-6">
               <div className="text-center mb-8">
                 <h3 className="text-xl font-semibold text-slate-700 mb-2">Pilih Mode Permainan</h3>
                 <p className="text-slate-500">nih aku buatin tempat kamu latian wkwkw</p>
               </div>
-
               <div className="space-y-4">
                 <Button
                   className="w-full h-16 text-lg font-semibold bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]"
@@ -1111,7 +1102,6 @@ export default function SplendorGame() {
                     <span>Permainan Dua Pemain</span>
                   </div>
                 </Button>
-
                 <Button
                   className="w-full h-16 text-lg font-semibold bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]"
                   onClick={() => initializeGame("pve")}
@@ -1130,7 +1120,6 @@ export default function SplendorGame() {
                   </div>
                 </Button>
               </div>
-
               <div className="mt-8 pt-6 border-t border-slate-200">
                 <div className="grid grid-cols-3 gap-4 text-center">
                   <div className="flex flex-col items-center">
@@ -1155,7 +1144,6 @@ export default function SplendorGame() {
               </div>
             </CardContent>
           </Card>
-
           {/* Footer */}
           <div className="text-center mt-6">
             <p className="text-center text-sm text-gray-500 mt-8 nothint">
@@ -1167,10 +1155,8 @@ export default function SplendorGame() {
       </div>
     )
   }
-
   const currentPlayer = gameState.players[gameState.currentPlayer]
   const currentPlayerBonuses = calculatePlayerBonuses(currentPlayer)
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-50 p-2 md:p-4">
       <div className="max-w-full mx-auto space-y-4">
@@ -1184,7 +1170,6 @@ export default function SplendorGame() {
               Splendor
             </h1>
           </div>
-
           {gameState.winner !== null ? (
             <div className="flex items-center gap-3 text-green-600 bg-green-50 px-4 py-2 rounded-lg animate-bounce">
               <Trophy className="w-8 h-8" />
@@ -1208,7 +1193,6 @@ export default function SplendorGame() {
               )}
             </div>
           )}
-
           <Button
             variant="outline"
             onClick={() => setGameState(initialGameState)}
@@ -1231,7 +1215,7 @@ export default function SplendorGame() {
         {/* Main Game Layout */}
         <div className="grid grid-cols-1 xl:grid-cols-5 gap-4">
           {" "}
-          {/* Changed xl:grid-cols-4 to xl:grid-cols-5 */}
+          {/* Changed xl:col-span-4 to xl:col-span-5 */}
           {/* Players Side by Side */}
           <div className="xl:col-span-1 space-y-4 sm:space-y-2">
             {/* Current Player */}
@@ -1266,7 +1250,6 @@ export default function SplendorGame() {
                     ))}
                   </div>
                 </div>
-
                 {/* Player Card Bonuses */}
                 <div>
                   <h4 className="font-semibold mb-2 text-sm text-gray-600">Bonus Kartu</h4>
@@ -1285,7 +1268,6 @@ export default function SplendorGame() {
                     })}
                   </div>
                 </div>
-
                 {/* Reserved Cards */}
                 {gameState.players[0].reservedCards.length > 0 && (
                   <div>
@@ -1295,7 +1277,7 @@ export default function SplendorGame() {
                         {gameState.players[0].reservedCards.length}
                       </span>
                     </h4>
-                    <div className="flex gap-2 overflow-x-auto pb-2 justify-center md:justify-start sm:grid sm:grid-cols-3 sm:gap-3">
+                    <div className="grid grid-cols-2 gap-2 justify-items-center">
                       {gameState.players[0].reservedCards.map((card) => (
                         <div
                           key={card.id}
@@ -1305,8 +1287,14 @@ export default function SplendorGame() {
                             card={card}
                             canBuy={canAffordCard(gameState.players[0], card)}
                             onBuy={() => {
-                              setGameState((prev) => buyReservedCardLogic(prev, gameState.currentPlayer, card))
-                              nextTurn()
+                              setGameState((prev) => {
+                                const newState = buyReservedCardLogic(prev, gameState.currentPlayer, card)
+                                return {
+                                  ...newState,
+                                  currentPlayer: (newState.currentPlayer + 1) % 2,
+                                  lastBotAction: null,
+                                }
+                              })
                             }}
                             showActions={!currentPlayer.isBot && !gameState.winner}
                             animatingCardId={gameState.animatingCard}
@@ -1319,7 +1307,6 @@ export default function SplendorGame() {
                 )}
               </CardContent>
             </Card>
-
             {/* Opponent */}
             <Card
               className={`${gameState.currentPlayer === 1 ? "ring-2 ring-blue-600 bg-blue-100 animate-pulse" : "bg-white"} shadow-lg transition-all duration-800`}
@@ -1352,7 +1339,6 @@ export default function SplendorGame() {
                     ))}
                   </div>
                 </div>
-
                 {/* Opponent Card Bonuses */}
                 <div>
                   <h4 className="font-semibold mb-2 text-sm text-gray-600">Bonus Kartu</h4>
@@ -1371,7 +1357,6 @@ export default function SplendorGame() {
                     })}
                   </div>
                 </div>
-
                 {/* Opponent Reserved Cards */}
                 {gameState.players[1].reservedCards.length > 0 && (
                   <div>
@@ -1381,15 +1366,21 @@ export default function SplendorGame() {
                         {gameState.players[1].reservedCards.length}
                       </span>
                     </h4>
-                    <div className="flex gap-2 overflow-x-auto pb-2 justify-center md:justify-start sm:grid sm:grid-cols-3 sm:gap-3">
+                    <div className="grid grid-cols-[repeat(auto-fill,minmax(128px,1fr))] gap-2 justify-items-center">
                       {gameState.players[1].reservedCards.map((card) => (
                         <DevelopmentCardComponent
                           key={card.id}
                           card={card}
                           canBuy={canAffordCard(gameState.players[1], card)}
                           onBuy={() => {
-                            setGameState((prev) => buyReservedCardLogic(prev, gameState.currentPlayer, card))
-                            nextTurn()
+                            setGameState((prev) => {
+                              const newState = buyReservedCardLogic(prev, gameState.currentPlayer, card)
+                              return {
+                                ...newState,
+                                currentPlayer: (newState.currentPlayer + 1) % 2,
+                                lastBotAction: null,
+                              }
+                            })
                           }}
                           showActions={!currentPlayer.isBot && !gameState.winner}
                           animatingCardId={gameState.animatingCard}
@@ -1416,11 +1407,10 @@ export default function SplendorGame() {
                         <Diamond className="w-5 h-5 text-blue-600" />
                         {tier === "tier3" ? "Tingkat 3" : tier === "tier2" ? "Tingkat 2" : "Tingkat 1"}
                       </h4>
-                      <div
-                        className="flex items-end gap-4 pb-2 justify-center"
-                      >
+                      <div className="flex items-end gap-4 pb-2 justify-center">
                         {/* Deck Counter */}
                         <DeckCounter
+                          tierName={tier === "tier3" ? "Tingkat 3" : tier === "tier2" ? "Tingkat 2" : "Tingkat 1"}
                           count={gameState.decks[tier].length}
                         />
                         {/* Card Slots */}
@@ -1433,23 +1423,37 @@ export default function SplendorGame() {
                               onBuy={
                                 card
                                   ? () => {
-                                    setGameState((prev) =>
-                                      buyCardLogic(prev, gameState.currentPlayer, card, tier, index),
-                                    )
-                                    nextTurn()
-                                  }
+                                      setGameState((prev) => {
+                                        const newState = buyCardLogic(prev, gameState.currentPlayer, card, tier, index)
+                                        return {
+                                          ...newState,
+                                          currentPlayer: (newState.currentPlayer + 1) % 2,
+                                          lastBotAction: null,
+                                        }
+                                      })
+                                    }
                                   : undefined
                               }
                               onReserve={
                                 card
                                   ? () => {
-                                    if (gameState.gems.gold > 0) {
-                                      setGameState((prev) =>
-                                        reserveCardLogic(prev, gameState.currentPlayer, card, tier, index),
-                                      )
-                                      nextTurn()
+                                      if (gameState.gems.gold > 0) {
+                                        setGameState((prev) => {
+                                          const newState = reserveCardLogic(
+                                            prev,
+                                            gameState.currentPlayer,
+                                            card,
+                                            tier,
+                                            index,
+                                          )
+                                          return {
+                                            ...newState,
+                                            currentPlayer: (newState.currentPlayer + 1) % 2,
+                                            lastBotAction: null,
+                                          }
+                                        })
+                                      }
                                     }
-                                  }
                                   : undefined
                               }
                               showActions={!currentPlayer.isBot && !gameState.winner}
@@ -1486,12 +1490,10 @@ export default function SplendorGame() {
                     ))}
                   </div>
                 </div>
-
                 {/* Gem Taking Interface */}
                 {!currentPlayer.isBot && !gameState.winner && (
                   <div className="bg-blue-50 p-4 rounded-lg border-2 border-dashed border-blue-300">
                     <h5 className="font-semibold mb-3 text-center text-blue-700">Pilih Permata untuk Diambil</h5>
-
                     {/* Selected Gems Display (clickable GemTokens) */}
                     <div className="flex gap-2 justify-center mb-4">
                       {GEM_COLORS.map((color) => (
@@ -1499,11 +1501,11 @@ export default function SplendorGame() {
                           <button
                             type="button"
                             className={`
-                          relative flex flex-col items-center justify-center p-1 rounded-full
-                          ${gameState.gems[color] === 0 ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}
-                          ${gameState.selectedGems[color] > 0 ? "ring-2 ring-blue-500" : ""}
-                          transition-all duration-200
-                        `}
+                        relative flex flex-col items-center justify-center p-1 rounded-full
+                        ${gameState.gems[color] === 0 ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}
+                        ${gameState.selectedGems[color] > 0 ? "ring-2 ring-blue-500" : ""}
+                        transition-all duration-200
+                      `}
                             onClick={() => updateSelectedGems(color)}
                             disabled={gameState.gems[color] === 0}
                           >
@@ -1513,7 +1515,6 @@ export default function SplendorGame() {
                         </div>
                       ))}
                     </div>
-
                     {/* Rules Display */}
                     <div className="text-xs text-gray-600 mb-3 bg-white p-2 rounded">
                       <p className="font-semibold mb-1">Aturan:</p>
@@ -1524,7 +1525,6 @@ export default function SplendorGame() {
                         <li>Total permata tidak boleh lebih dari 10</li>
                       </ul>
                     </div>
-
                     {/* Action Buttons */}
                     <div className="flex gap-2 justify-center">
                       <Button
@@ -1532,15 +1532,18 @@ export default function SplendorGame() {
                           setGameState((prev) => {
                             const newState = takeGemsLogic(prev, gameState.currentPlayer, gameState.selectedGems)
                             gemCollectSound.current?.play() // Play sound
-                            return newState
+                            return {
+                              ...newState,
+                              currentPlayer: (newState.currentPlayer + 1) % 2,
+                              lastBotAction: null,
+                            }
                           })
-                          nextTurn()
                         }}
                         disabled={
                           !canTakeSelectedGems() ||
                           getTotalGems(currentPlayer.gems) +
-                          Object.values(gameState.selectedGems).reduce((a, b) => a + b, 0) >
-                          10
+                            Object.values(gameState.selectedGems).reduce((a, b) => a + b, 0) >
+                            10
                         }
                         className="bg-green-600 hover:bg-green-700 transition-all duration-200 transform hover:scale-105"
                       >
@@ -1588,62 +1591,56 @@ export default function SplendorGame() {
           </div>
         </div>
       </div>
-
       <style jsx>{`
-    @media (max-width: 640px) {
-      .max-w-7xl {
-        max-width: 100vw;
-        padding: 0 2px;
-      }
-      .grid {
-        display: flex;
-        flex-direction: column;
-        gap: 8px !important;
-      }
-      .xl\\:col-span-1, .xl\\:col-span-2, .xl\\:col-span-3 { /* Added xl:col-span-3 */
-        width: 100% !important;
-        grid-column: span 1 / span 1 !important;
-      }
-      .space-y-4 > :not([hidden]) ~ :not([hidden]) {
-        margin-top: 0.5rem;
-      }
-      .flex-wrap, .flex {
-        flex-wrap: wrap !important;
-      }
-      .p-4 {
-        padding: 0.5rem !important;
-      }
-      .gap-3, .gap-4 {
-        gap: 0.5rem !important;
-      }
+  @media (max-width: 640px) {
+    .max-w-7xl {
+      max-width: 100vw;
+      padding: 0 2px;
     }
-    @keyframes fade-in {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
+    .grid {
+      display: flex;
+      flex-direction: column;
+      gap: 8px !important;
     }
-    
-    @keyframes slide-down {
-      from { opacity: 0; transform: translateY(-20px); }
-      to { opacity: 1; transform: translateY(0); }
+    .xl\\:col-span-1, .xl\\:col-span-2, .xl\\:col-span-3 { /* Added xl:col-span-3 */
+      width: 100% !important;
+      grid-column: span 1 / span 1 !important;
     }
-    
-    @keyframes slide-in {
-      from { opacity: 0; transform: translateX(-20px); }
-      to { opacity: 1; transform: translateX(0); }
+    .space-y-4 > :not([hidden]) ~ :not([hidden]) {
+      margin-top: 0.5rem;
     }
-    
-    .animate-fade-in {
-      animation: fade-in 0.5s ease-out;
+    .flex-wrap, .flex {
+      flex-wrap: wrap !important;
     }
-    
-    .animate-slide-down {
-      animation: slide-down 0.3s ease-out;
+    .p-4 {
+      padding: 0.5rem !important;
     }
-    
-    .animate-slide-in {
-      animation: slide-in 0.4s ease-out;
+    .gap-3, .gap-4 {
+      gap: 0.5rem !important;
     }
-  `}</style>
+  }
+  @keyframes fade-in {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+      @keyframes slide-down {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+      @keyframes slide-in {
+    from { opacity: 0; transform: translateX(-20px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+      .animate-fade-in {
+    animation: fade-in 0.5s ease-out;
+  }
+      .animate-slide-down {
+    animation: slide-down 0.3s ease-out;
+  }
+      .animate-slide-in {
+    animation: slide-in 0.4s ease-out;
+  }
+`}</style>
     </div>
   )
 }
