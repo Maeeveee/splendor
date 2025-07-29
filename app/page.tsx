@@ -998,7 +998,7 @@ export default function SplendorGame() {
           <div className="xl:col-span-1 space-y-4 sm:space-y-2">
             {/* Current Player */}
             <Card
-              className={`${gameState.currentPlayer === 0 ? "ring-2 ring-blue-400 bg-blue-50 animate-pulse" : "bg-white"} shadow-lg transition-all duration-300`}
+              className={`${gameState.currentPlayer === 0 ? "ring-2 ring-blue-600 bg-blue-100 animate-pulse" : "bg-white"} shadow-lg transition-all duration-800`}
             >
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2 text-lg">
@@ -1077,7 +1077,7 @@ export default function SplendorGame() {
 
             {/* Opponent */}
             <Card
-              className={`${gameState.currentPlayer === 1 ? "ring-2 ring-blue-400 bg-blue-50 animate-pulse" : "bg-white"} shadow-lg transition-all duration-300`}
+              className={`${gameState.currentPlayer === 1 ? "ring-2 ring-blue-600 bg-blue-100 animate-pulse" : "bg-white"} shadow-lg transition-all duration-800`}
             >
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2 text-lg">
