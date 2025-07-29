@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   title: 'Splendor jadi jadian',
   icons: {
     icon: '/diamond.png'},
-  description: 'Created with me & v0',
+  description: 'Splendor jadi jadian adalah game digital berbasis web yang terinspirasi dari board game Splendor. Mainkan, kumpulkan permata, dan kalahkan lawanmu secara online!',
   generator: 'v0.dev',
 }
 

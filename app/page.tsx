@@ -828,6 +828,10 @@ export default function SplendorGame() {
     return differentColors <= 3 && totalSelected <= 3
   }
 
+  // Tambahkan di dalam SplendorGame, sebelum return
+  const getTotalGems = (player: Player) =>
+    GEM_COLORS.reduce((sum, color) => sum + player.gems[color], 0) + player.gems.gold
+
   // Moved the menu rendering logic to the top of the SplendorGame component
   if (gameState.gameMode === "menu") {
     return (
@@ -1009,7 +1013,12 @@ export default function SplendorGame() {
               <CardContent className="space-y-3">
                 {/* Player Gems */}
                 <div>
-                  <h4 className="font-semibold mb-2 text-sm text-gray-600">Permata</h4>
+                  <h4 className="font-semibold mb-2 text-sm text-gray-600 flex items-center justify-between">
+                    Permata
+                    <span className="ml-2 text-xs text-gray-700 font-semibold">
+                      Total: {getTotalGems(gameState.players[0])}
+                    </span>
+                  </h4>
                   <div className="flex gap-2 overflow-x-auto pb-1 sm:grid sm:grid-cols-7 sm:overflow-x-visible sm:gap-3">
                     {[...GEM_COLORS, "gold" as const].map((color) => (
                       <div key={color} className="flex flex-col items-center min-w-[48px]">
@@ -1083,7 +1092,12 @@ export default function SplendorGame() {
               <CardContent className="space-y-3">
                 {/* Opponent Gems */}
                 <div>
-                  <h4 className="font-semibold mb-2 text-sm text-gray-600">Permata</h4>
+                  <h4 className="font-semibold mb-2 text-sm text-gray-600 flex items-center justify-between">
+                    Permata
+                    <span className="ml-2 text-xs text-gray-700 font-semibold">
+                      Total: {getTotalGems(gameState.players[1])}
+                    </span>
+                  </h4>
                   <div className="flex gap-2 overflow-x-auto pb-1 sm:grid sm:grid-cols-7 sm:overflow-x-visible sm:gap-3">
                     {[...GEM_COLORS, "gold" as const].map((color) => (
                       <div key={color} className="flex flex-col items-center min-w-[48px]">
