@@ -847,13 +847,12 @@ export default function SplendorGame() {
                 </div>
               </div>
               <CardTitle className="text-4xl font-bold mb-2">Splendor</CardTitle>
-              <p className="text-slate-300 text-lg">Aku buatin tempat kamu latian</p>
             </CardHeader>
 
             <CardContent className="p-8 space-y-6">
               <div className="text-center mb-8">
                 <h3 className="text-xl font-semibold text-slate-700 mb-2">Pilih Mode Permainan</h3>
-                <p className="text-slate-500">Kumpulkan permata dan beli kartu untuk menjadi pedagang terkaya!</p>
+                <p className="text-slate-500">nih aku buatin tempat kamu latian wkwkw</p>
               </div>
 
               <div className="space-y-4">
@@ -920,8 +919,9 @@ export default function SplendorGame() {
 
           {/* Footer */}
           <div className="text-center mt-6">
-            <p className="text-slate-400 text-sm">Jadilah pedagang permata terhebat di masa Renaissance</p>
-          </div>
+            <p className="text-center text-sm text-gray-500 mt-8 nothint">
+              Made with <span className=" hint text-gray-100">♥</span> by <span className="hint text-gray-100">rizal</span>
+            </p>          </div>
         </div>
       </div>
     )
