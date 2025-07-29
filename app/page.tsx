@@ -206,9 +206,8 @@ const DevelopmentCardComponent = ({
   isReserved?: boolean
 }) => (
   <Card
-    className={`w-32 h-44 relative bg-gradient-to-br from-white to-gray-50 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 ${
-      animatingCardId === card.id ? "animate-pulse ring-2 ring-green-400" : ""
-    } ${isReserved ? "border-blue-400 border-2" : ""}`}
+    className={`w-32 h-44 relative bg-gradient-to-br from-white to-gray-50 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 ${animatingCardId === card.id ? "animate-pulse ring-2 ring-green-400" : ""
+      } ${isReserved ? "border-blue-400 border-2" : ""}`}
   >
     <CardHeader className="p-2 pb-1">
       <div className="flex justify-between items-center">
@@ -275,9 +274,8 @@ const NobleComponent = ({ noble, playerBonuses }: { noble: Noble; playerBonuses:
 
   return (
     <Card
-      className={`w-28 h-28 relative bg-gradient-to-br from-purple-50 to-indigo-50 shadow-lg flex flex-col items-center justify-center p-2 transition-all duration-300 hover:scale-105 ${
-        canVisit ? "ring-2 ring-yellow-400" : "opacity-70"
-      }`}
+      className={`w-28 h-28 relative bg-gradient-to-br from-purple-50 to-indigo-50 shadow-lg flex flex-col items-center justify-center p-2 transition-all duration-300 hover:scale-105 ${canVisit ? "ring-2 ring-yellow-400" : "opacity-70"
+        }`}
     >
       <Crown className="w-6 h-6 text-purple-600 mb-1" />
       <Badge variant="secondary" className="bg-yellow-100 text-yellow-800 border-yellow-300 text-xs px-1 py-0 mb-2">
@@ -327,7 +325,7 @@ export default function SplendorGame() {
     const shuffled = [...array]
     for (let i = shuffled.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1))
-      ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+        ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
     }
     return shuffled
   }
@@ -341,7 +339,7 @@ export default function SplendorGame() {
     const players: Player[] = [
       {
         id: 0,
-        name: "Pemain 1",
+        name: "Kamu",
         isBot: false,
         gems: { white: 0, blue: 0, green: 0, red: 0, black: 0, gold: 0 },
         cards: [],
@@ -849,7 +847,7 @@ export default function SplendorGame() {
                 </div>
               </div>
               <CardTitle className="text-4xl font-bold mb-2">Splendor</CardTitle>
-              <p className="text-slate-300 text-lg">Permainan Pedagang Renaissance</p>
+              <p className="text-slate-300 text-lg">Aku buatin tempat kamu latian</p>
             </CardHeader>
 
             <CardContent className="p-8 space-y-6">
@@ -1011,7 +1009,7 @@ export default function SplendorGame() {
                 {/* Player Gems */}
                 <div>
                   <h4 className="font-semibold mb-2 text-sm text-gray-600">Permata</h4>
-                  <div className="flex gap-2 overflow-x-auto pb-1">
+                  <div className="flex gap-2 overflow-x-auto pb-1 sm:grid sm:grid-cols-7 sm:overflow-x-visible sm:gap-3">
                     {[...GEM_COLORS, "gold" as const].map((color) => (
                       <div key={color} className="flex flex-col items-center min-w-[48px]">
                         <GemToken color={color} count={gameState.players[0].gems[color]} size="small" />
@@ -1024,7 +1022,7 @@ export default function SplendorGame() {
                 {/* Player Card Bonuses */}
                 <div>
                   <h4 className="font-semibold mb-2 text-sm text-gray-600">Bonus Kartu</h4>
-                  <div className="flex gap-1 overflow-x-auto pb-1">
+                  <div className="flex gap-1 overflow-x-auto pb-1 sm:grid sm:grid-cols-6 sm:overflow-x-visible sm:gap-2">
                     {GEM_COLORS.map((color) => {
                       const count = gameState.players[0].cards.filter((card) => card.provides === color).length
                       return (
@@ -1085,7 +1083,7 @@ export default function SplendorGame() {
                 {/* Opponent Gems */}
                 <div>
                   <h4 className="font-semibold mb-2 text-sm text-gray-600">Permata</h4>
-                  <div className="flex gap-2 overflow-x-auto pb-1">
+                  <div className="flex gap-2 overflow-x-auto pb-1 sm:grid sm:grid-cols-7 sm:overflow-x-visible sm:gap-3">
                     {[...GEM_COLORS, "gold" as const].map((color) => (
                       <div key={color} className="flex flex-col items-center min-w-[48px]">
                         <GemToken color={color} count={gameState.players[1].gems[color]} size="small" />
@@ -1098,7 +1096,7 @@ export default function SplendorGame() {
                 {/* Opponent Card Bonuses */}
                 <div>
                   <h4 className="font-semibold mb-2 text-sm text-gray-600">Bonus Kartu</h4>
-                  <div className="flex gap-1 overflow-x-auto pb-1">
+                  <div className="flex gap-1 overflow-x-auto pb-1 sm:grid sm:grid-cols-6 sm:overflow-x-visible sm:gap-2">
                     {GEM_COLORS.map((color) => {
                       const count = gameState.players[1].cards.filter((card) => card.provides === color).length
                       return (
@@ -1145,24 +1143,18 @@ export default function SplendorGame() {
           {/* Game Board - Development Cards */}
           <div className="xl:col-span-2 sm:col-span-1">
             <Card className="shadow-lg bg-gradient-to-br from-white to-gray-50">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Diamond className="w-6 h-6 text-purple-600" />
-                  Papan Permainan
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
+              <CardContent className="space-y-6 mt-4">
                 {/* Development Cards */}
                 <div className="space-y-4">
                   {(["tier3", "tier2", "tier1"] as const).map((tier) => (
                     <div key={tier}>
-                      <h4 className="font-semibold mb-3 flex items-center gap-2">
+                      <h4 className="font-semibold text-2xl mb-3 flex items-center gap-2">
                         <Diamond className="w-5 h-5 text-blue-600" />
                         {tier === "tier3"
-                          ? "Tingkat 3 (Mahal)"
+                          ? "Tingkat 3"
                           : tier === "tier2"
-                            ? "Tingkat 2 (Sedang)"
-                            : "Tingkat 1 (Murah)"}
+                            ? "Tingkat 2"
+                            : "Tingkat 1"}
                       </h4>
                       <div className="flex lg:gap-5 gap-7 overflow-x-auto pb-2 justify-center md:justify-start">
                         {gameState.availableCards[tier].map((card) => (
@@ -1299,7 +1291,7 @@ export default function SplendorGame() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Crown className="w-6 h-6 text-purple-600" />
-                  Bangsawan
+                  Para Raja
                 </CardTitle>
               </CardHeader>
               <CardContent className="flex flex-wrap justify-center gap-3 p-4">
@@ -1308,6 +1300,9 @@ export default function SplendorGame() {
                 ))}
               </CardContent>
             </Card>
+            <p className="text-center text-sm text-gray-500 mt-8 nothint">
+              Made with <span className=" hint text-gray-100">♥</span> by <span className="hint text-gray-100">rizal</span>
+            </p>
           </div>
         </div>
       </div>
