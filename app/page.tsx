@@ -392,12 +392,12 @@ const CardSlot = ({
 }
 
 // New: Deck Counter Component
-const DeckCounter = ({ tierName, count }: { tierName: string; count: number }) => (
+const DeckCounter = ({ count }: { count: number }) => (
   <Card className="w-32 h-36 relative shadow-lg bg-slate-800 text-white flex flex-col items-center justify-center p-2">
     {" "}
     {/* Changed w-28 to w-32, h-34 to h-36 */}
     <div className="text-3xl font-bold">{count}</div> {/* Changed text-4xl to text-3xl */}
-    <div className="text-sm mt-2 text-center">Kartu {tierName} Tersisa</div>
+    <div className="text-sm mt-2 text-center">Kartu Tersisa</div>
     <div className="absolute bottom-2 right-2">
       <Gem className="w-4 h-4 text-gray-400" />
     </div>
@@ -1410,7 +1410,6 @@ export default function SplendorGame() {
                       <div className="flex items-end gap-4 pb-2 justify-center">
                         {/* Deck Counter */}
                         <DeckCounter
-                          tierName={tier === "tier3" ? "Tingkat 3" : tier === "tier2" ? "Tingkat 2" : "Tingkat 1"}
                           count={gameState.decks[tier].length}
                         />
                         {/* Card Slots */}
