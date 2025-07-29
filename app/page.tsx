@@ -920,8 +920,9 @@ export default function SplendorGame() {
           {/* Footer */}
           <div className="text-center mt-6">
             <p className="text-center text-sm text-gray-500 mt-8 nothint">
-              Made with <span className=" hint text-gray-100">♥</span> by <span className="hint text-gray-100">rizal</span>
-            </p>          </div>
+              Made with <span className=" hint text-gray-100 animate-pulse ">♥</span> by <span className="hint text-gray-100">rizal</span>
+            </p>
+          </div>
         </div>
       </div>
     )
