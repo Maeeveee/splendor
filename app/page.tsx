@@ -206,7 +206,7 @@ const DevelopmentCardComponent = ({
   isReserved?: boolean
 }) => (
   <Card
-    className={`w-32 h-44 relative bg-gradient-to-br from-white to-gray-50 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 ${animatingCardId === card.id ? "animate-pulse ring-2 ring-green-400" : ""
+    className={`w-32 h-36 relative bg-gradient-to-br from-white to-gray-50 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 ${animatingCardId === card.id ? "animate-pulse ring-2 ring-green-400" : ""
       } ${isReserved ? "border-blue-400 border-2" : ""}`}
   >
     <CardHeader className="p-2 pb-1">
@@ -227,7 +227,7 @@ const DevelopmentCardComponent = ({
     <CardContent className="p-2 pt-0 pb-8">
       <div className="space-y-1">
         <div className="text-xs font-semibold text-gray-600 mb-1">Biaya:</div>
-        <div className="space-y-1 max-h-20 overflow-y-auto">
+        <div className="grid grid-cols-2 gap-x-2 gap-y-1 max-h-20 overflow-y-auto">
           {GEM_COLORS.map(
             (color) =>
               card.cost[color] > 0 && (
