@@ -206,8 +206,20 @@ const DevelopmentCardComponent = ({
   isReserved?: boolean
 }) => (
   <Card
-    className={`w-32 h-34 relative bg-gradient-to-br from-white to-gray-50 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 ${animatingCardId === card.id ? "animate-pulse ring-2 ring-green-400" : ""
-      } ${isReserved ? "border-blue-400 border-2" : ""}`}
+    className={`
+    w-32 h-34 relative 
+    shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105
+    ${animatingCardId === card.id ? "animate-pulse ring-2 ring-green-400" : ""}
+    ${isReserved ? "border-blue-400 border-2" : ""}
+    ${
+      card.provides === "white" ? "bg-gray-100"
+      : card.provides === "blue" ? "bg-blue-100"
+      : card.provides === "green" ? "bg-green-100"
+      : card.provides === "red" ? "bg-red-100"
+      : card.provides === "black" ? "bg-gray-700"
+      : ""
+    }
+  `}
   >
     <CardHeader className="p-2 pb-1">
       <div className="flex justify-between items-center">
@@ -226,7 +238,7 @@ const DevelopmentCardComponent = ({
     </CardHeader>
     <CardContent className="p-2 pt-0 pb-8">
       <div className="space-y-1">
-        <div className="text-xs font-semibold text-gray-600 mb-1">Biaya:</div>
+        <div className={`text-xs font-semibold mb-1 ${card.provides === "black" ? "text-white" : "text-gray-600"}`}>Biaya:</div>
         <div className="grid grid-cols-2 gap-x-2 gap-y-1 max-h-20 overflow-y-auto">
           {GEM_COLORS.map(
             (color) =>
@@ -235,7 +247,9 @@ const DevelopmentCardComponent = ({
                   <div className={`w-3 h-3 rounded-full border ${getGemColor(color)} flex items-center justify-center`}>
                     {getGemIcon(color)}
                   </div>
-                  <span className="text-xs font-medium">{card.cost[color]}</span>
+                  <span className={`text-xs font-medium ${card.provides === "black" ? "text-white" : "text-gray-700"}`}>
+                    {card.cost[color]}
+                  </span>
                 </div>
               ),
           )}
