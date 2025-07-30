@@ -1099,7 +1099,7 @@ export default function SplendorGame() {
                         <User className="w-5 h-5 text-blue-600" />
                       </div>
                     </div>
-                    <span>Permainan Dua Pemain</span>
+                    <span>Mabarrrr</span>
                   </div>
                 </Button>
                 <Button
