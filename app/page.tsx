@@ -1502,7 +1502,7 @@ export default function SplendorGame() {
                             className={`
                         relative flex flex-col items-center justify-center p-1 rounded-full
                         ${gameState.gems[color] === 0 ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}
-                        ${gameState.selectedGems[color] > 0 ? "ring-2 ring-blue-500" : ""}
+                        ${gameState.selectedGems[color] > 0 ? "" : ""}
                         transition-all duration-200
                       `}
                             onClick={() => updateSelectedGems(color)}
