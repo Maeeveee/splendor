@@ -431,12 +431,21 @@ const initialGameState: GameState = {
 
 export default function SplendorGame() {
   const [gameState, setGameState] = useState<GameState>(initialGameState)
+  const [botNotif, setBotNotif] = useState<string | null>(null)
 
   // Inisialisasi objek Audio menggunakan useRef
   const gemCollectSound = useRef(typeof Audio !== "undefined" ? new Audio("/sounds/gem-collect.mp3") : null)
   const cardBuySound = useRef(typeof Audio !== "undefined" ? new Audio("/sounds/card-buy.mp3") : null)
   const cardReserveSound = useRef(typeof Audio !== "undefined" ? new Audio("/sounds/card-reserve.mp3") : null)
   const gameWinSound = useRef(typeof Audio !== "undefined" ? new Audio("/sounds/game-win.mp3") : null)
+
+  useEffect(() => {
+    if (gameState.lastBotAction) {
+      setBotNotif(gameState.lastBotAction)
+      const timer = setTimeout(() => setBotNotif(null), 2500) // 2.5 detik
+      return () => clearTimeout(timer)
+    }
+  }, [gameState.lastBotAction])
 
   const shuffleArray = <T,>(array: T[]): T[] => {
     const shuffled = [...array]
@@ -1159,6 +1168,15 @@ export default function SplendorGame() {
   const currentPlayerBonuses = calculatePlayerBonuses(currentPlayer)
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-50 p-2 md:p-4">
+      {/* Overlay Bot Notif */}
+      {botNotif && (
+        <div className="fixed top-6 left-6 z-[9999] animate-fade-in">
+          <div className="flex items-center gap-2 bg-blue-50 border border-blue-200 shadow-xl rounded-lg px-5 py-3 text-blue-700 font-semibold text-base">
+            <Bot className="w-5 h-5" />
+            <span>{botNotif}</span>
+          </div>
+        </div>
+      )}
       <div className="max-w-full mx-auto space-y-4">
         {" "}
         {/* Changed max-w-7xl to max-w-full */}
@@ -1202,16 +1220,7 @@ export default function SplendorGame() {
           </Button>
         </div>
         {/* Bot Action Feedback */}
-        {gameState.lastBotAction && (
-          <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200 shadow-md animate-slide-in">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3 text-blue-700">
-                <Bot className="w-5 h-5" />
-                <span className="font-medium">{gameState.lastBotAction}</span>
-              </div>
-            </CardContent>
-          </Card>
-        )}
+        
         {/* Main Game Layout */}
         <div className="grid grid-cols-1 xl:grid-cols-5 gap-4">
           {" "}
