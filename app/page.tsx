@@ -1362,6 +1362,7 @@ export default function SplendorGame() {
                   <div>
                     <h4 className="font-semibold mb-2 text-sm text-gray-600 flex items-center gap-2">
                       Cadangan
+                     
                       <span className="bg-blue-100 text-blue-700 rounded px-2 py-0.5 text-xs font-semibold">
                         {gameState.players[1].reservedCards.length}
                       </span>
@@ -1413,38 +1414,25 @@ export default function SplendorGame() {
                           count={gameState.decks[tier].length}
                         />
                         {/* Card Slots */}
-                        {gameState.availableCards[tier].map((card, index) => (
-                          <div key={card ? card.id : `empty-${tier}-${index}`} className="flex-shrink-0">
-                            <CardSlot
-                              card={card}
-                              tier={tier}
-                              canBuy={card ? canAffordCard(currentPlayer, card) : false}
-                              onBuy={
-                                card
-                                  ? () => {
-                                      setGameState((prev) => {
-                                        const newState = buyCardLogic(prev, gameState.currentPlayer, card, tier, index)
-                                        return {
-                                          ...newState,
-                                          currentPlayer: (newState.currentPlayer + 1) % 2,
-                                          lastBotAction: null,
-                                        }
-                                      })
-                                    }
-                                  : undefined
-                              }
-                              onReserve={
-                                card
-                                  ? () => {
-                                      if (gameState.gems.gold > 0) {
+                        {gameState.availableCards[tier].map((card, index) => {
+                          // Cek apakah card ini sudah di-reserved oleh siapapun
+                          const isReservedByAnyone =
+                            card &&
+                            gameState.players.some((player) =>
+                              player.reservedCards.some((reserved) => reserved.id === card.id)
+                            )
+
+                          return (
+                            <div key={card ? card.id : `empty-${tier}-${index}`} className="flex-shrink-0">
+                              <CardSlot
+                                card={isReservedByAnyone ? null : card}
+                                tier={tier}
+                                canBuy={card && !isReservedByAnyone ? canAffordCard(currentPlayer, card) : false}
+                                onBuy={
+                                  card && !isReservedByAnyone
+                                    ? () => {
                                         setGameState((prev) => {
-                                          const newState = reserveCardLogic(
-                                            prev,
-                                            gameState.currentPlayer,
-                                            card,
-                                            tier,
-                                            index,
-                                          )
+                                          const newState = buyCardLogic(prev, gameState.currentPlayer, card, tier, index)
                                           return {
                                             ...newState,
                                             currentPlayer: (newState.currentPlayer + 1) % 2,
@@ -1452,15 +1440,37 @@ export default function SplendorGame() {
                                           }
                                         })
                                       }
-                                    }
-                                  : undefined
-                              }
-                              showActions={!currentPlayer.isBot && !gameState.winner}
-                              animatingCardId={gameState.animatingCard}
-                              index={index}
-                            />
-                          </div>
-                        ))}
+                                    : undefined
+                                }
+                                onReserve={
+                                  card && !isReservedByAnyone
+                                    ? () => {
+                                        if (gameState.gems.gold > 0) {
+                                          setGameState((prev) => {
+                                            const newState = reserveCardLogic(
+                                              prev,
+                                              gameState.currentPlayer,
+                                              card,
+                                              tier,
+                                              index,
+                                            )
+                                            return {
+                                              ...newState,
+                                              currentPlayer: (newState.currentPlayer + 1) % 2,
+                                              lastBotAction: null,
+                                            }
+                                          })
+                                        }
+                                      }
+                                    : undefined
+                                }
+                                showActions={!currentPlayer.isBot && !gameState.winner}
+                                animatingCardId={gameState.animatingCard}
+                                index={index}
+                              />
+                            </div>
+                          )
+                        })}
                       </div>
                     </div>
                   ))}
