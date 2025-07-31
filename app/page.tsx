@@ -1499,66 +1499,54 @@ export default function SplendorGame() {
             <Card className="shadow-lg bg-white mt-4">
               {" "}
               {/* Added mt-4 for spacing */}
-              <CardHeader className="pb-3">
-                <CardTitle className="flex items-center gap-2">
-                  <Coins className="w-6 h-6 text-yellow-600" />
-                  Persediaan Permata & Aksi
-                </CardTitle>
-              </CardHeader>
               <CardContent>
                 {/* Available Gems */}
-                <div className="mb-4">
+                <div className="mb-4 mt-4">
                   <div className="flex gap-3 justify-center">
                     {[...GEM_COLORS, "gold" as const].map((color) => (
-                      <div key={color} className="text-center">
-                        <GemToken color={color} count={gameState.gems[color]} size="large" />
-                        <p className="text-xs text-gray-600 mt-1 font-medium">Persediaan: {gameState.gems[color]}</p>
+                      <div key={color} className="flex flex-col items-center justify-center">
+                        <button
+                          type="button"
+                          className={`${gameState.gems[color] === 0 ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}transition-all duration-200`}
+                          onClick={() => {
+                            if (
+                              color !== "gold" &&
+                              gameState.gems[color] > 0 &&
+                              !currentPlayer.isBot &&
+                              !gameState.winner
+                            ) {
+                              updateSelectedGems(color)
+                            }
+                          }}
+                          disabled={
+                            color === "gold" ||
+                            gameState.gems[color] === 0 ||
+                            currentPlayer.isBot ||
+                            !!gameState.winner
+                          }
+                        >
+                          <GemToken
+                            color={color}
+                            // Tampilkan angka hanya jika dipilih, selain itu hanya icon
+                            count={gameState.selectedGems[color] > 0 ? gameState.selectedGems[color] : undefined}
+                            size="large"
+                          />
+                        </button>
+                        {/* Label persediaan di bawah */}
+                        <p className="text-xs text-gray-600 mt-1 font-medium">
+                          Persediaan: {gameState.gems[color]}
+                        </p>
                       </div>
                     ))}
                   </div>
-                </div>
-                {/* Gem Taking Interface */}
-                {!currentPlayer.isBot && !gameState.winner && (
-                  <div className="bg-blue-50 p-4 rounded-lg border-2 border-dashed border-blue-300">
-                    <h5 className="font-semibold mb-3 text-center text-blue-700">Pilih Permata untuk Diambil</h5>
-                    {/* Selected Gems Display (clickable GemTokens) */}
-                    <div className="flex gap-2 justify-center mb-4">
-                      {GEM_COLORS.map((color) => (
-                        <div key={color} className="text-center">
-                          <button
-                            type="button"
-                            className={`
-                        relative flex flex-col items-center justify-center p-1 rounded-full
-                        ${gameState.gems[color] === 0 ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}
-                        ${gameState.selectedGems[color] > 0 ? "" : ""}
-                        transition-all duration-200
-                      `}
-                            onClick={() => updateSelectedGems(color)}
-                            disabled={gameState.gems[color] === 0}
-                          >
-                            <GemToken color={color} count={gameState.selectedGems[color]} size="normal" />
-                            <p className="text-xs text-gray-600 mt-1">Dipilih: {gameState.selectedGems[color]}</p>
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                    {/* Rules Display */}
-                    <div className="text-xs text-gray-600 mb-3 bg-white p-2 rounded">
-                      <p className="font-semibold mb-1">Aturan:</p>
-                      <ul className="list-disc list-inside space-y-1">
-                        <li>Ambil hingga 3 permata warna berbeda, ATAU</li>
-                        <li>Ambil 2 permata warna sama (jika tersedia 4+)</li>
-                        <li>Tidak bisa dicampur: jika ambil 2 warna sama, tidak bisa ambil lainnya</li>
-                        <li>Total permata tidak boleh lebih dari 10</li>
-                      </ul>
-                    </div>
-                    {/* Action Buttons */}
-                    <div className="flex gap-2 justify-center">
+                  {/* Tombol konfirmasi & reset */}
+                  {!currentPlayer.isBot && !gameState.winner && (
+                    <div className="flex gap-2 justify-center mt-2">
                       <Button
                         onClick={() => {
                           setGameState((prev) => {
                             const newState = takeGemsLogic(prev, gameState.currentPlayer, gameState.selectedGems)
-                            gemCollectSound.current?.play() // Play sound
+                            gemCollectSound.current?.play()
                             return {
                               ...newState,
                               currentPlayer: (newState.currentPlayer + 1) % 2,
@@ -1569,8 +1557,7 @@ export default function SplendorGame() {
                         disabled={
                           !canTakeSelectedGems() ||
                           getTotalGems(currentPlayer.gems) +
-                          Object.values(gameState.selectedGems).reduce((a, b) => a + b, 0) >
-                          10
+                          Object.values(gameState.selectedGems).reduce((a, b) => a + b, 0) > 10
                         }
                         className="bg-green-600 hover:bg-green-700 transition-all duration-200 transform hover:scale-105"
                       >
@@ -1591,8 +1578,8 @@ export default function SplendorGame() {
                         Hapus Pilihan
                       </Button>
                     </div>
-                  </div>
-                )}
+                  )}
+                </div>
               </CardContent>
             </Card>
           </div>
