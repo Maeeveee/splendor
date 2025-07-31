@@ -1418,7 +1418,7 @@ export default function SplendorGame() {
             {" "}
             {/* Changed xl:col-span-2 to xl:col-span-3 */}
             <Card className="shadow-lg bg-gradient-to-br from-white to-gray-50 w-full max-w-full sm:max-w-3xl mx-auto p-2 sm:p-4">
-              <CardContent className="space-y-6 mt-4">
+              <CardContent className="mt-4 mb-0">
                 {/* Development Cards */}
                 <div className="space-y-4">
                   {(["tier3", "tier2", "tier1"] as const).map((tier) => (
@@ -1493,12 +1493,12 @@ export default function SplendorGame() {
               </CardContent>
             </Card>
             {/* Gem Supply and Taking - Returned to its original position below development cards */}
-            <Card className="shadow-lg bg-white mt-4">
+            <Card className="shadow-lg bg-white w-full max-w-full sm:max-w-3xl mx-auto mt-4 p-2 sm:p-4">
               {" "}
               {/* Added mt-4 for spacing */}
               <CardContent>
                 {/* Available Gems */}
-                <div className="mb-4 mt-4">
+                <div className="mt-4">
                   <div className="flex gap-3 justify-center">
                     {[...GEM_COLORS, "gold" as const].map((color) => (
                       <div key={color} className="flex flex-col items-center justify-center">
