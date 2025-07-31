@@ -396,9 +396,6 @@ const DeckCounter = ({ count }: { count: number }) => (
     {/* Changed w-28 to w-32, h-34 to h-36 */}
     <div className="text-3xl font-bold">{count}</div> {/* Changed text-4xl to text-3xl */}
     <div className="text-sm mt-2 text-center">Kartu Tersisa</div>
-    <div className="absolute bottom-2 right-2">
-      <Gem className="w-4 h-4 text-gray-400" />
-    </div>
   </Card>
 )
 
