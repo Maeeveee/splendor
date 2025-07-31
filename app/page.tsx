@@ -1265,9 +1265,9 @@ export default function SplendorGame() {
                           Total: {getTotalGems(gameState.players[0].gems)}
                         </span>
                       </h4>
-                      <div className="flex gap-2 overflow-x-auto pb-1 sm:grid sm:grid-cols-7 sm:overflow-x-visible sm:gap-3">
+                      <div className="grid grid-cols-3 gap-1 sm:grid-cols-7 sm:gap-3 pb-1">
                         {[...GEM_COLORS, "gold" as const].map((color) => (
-                          <div key={color} className="flex flex-col items-center min-w-[48px]">
+                          <div key={color} className="flex flex-col items-center min-w-0">
                             <GemToken color={color} count={gameState.players[0].gems[color]} size="small" />
                             <span className="text-xs text-gray-500 mt-1">{gameState.players[0].gems[color]}</span>
                           </div>
@@ -1277,7 +1277,7 @@ export default function SplendorGame() {
                     {/* Player Card Bonuses */}
                     <div>
                       <h4 className="font-semibold mb-2 text-sm text-gray-600">Bonus Kartu</h4>
-                      <div className="flex gap-1 overflow-x-auto pb-1 sm:grid sm:grid-cols-6 sm:overflow-x-visible sm:gap-2">
+                      <div className="grid grid-cols-5 gap-1 sm:grid-cols-6 sm:gap-2 pb-1">
                         {GEM_COLORS.map((color) => {
                           const count = gameState.players[0].cards.filter((card) => card.provides === color).length
                           return (
@@ -1356,9 +1356,8 @@ export default function SplendorGame() {
                           Total: {getTotalGems(gameState.players[1].gems)}
                         </span>
                       </h4>
-                      <div className="flex gap-2 overflow-x-auto pb-1 sm:grid sm:grid-cols-7 sm:overflow-x-visible sm:gap-3">
+                      <div className="grid grid-cols-3 gap-1 sm:grid-cols-7 sm:gap-3 pb-1">
                         {[...GEM_COLORS, "gold" as const].map((color) => (
-
                           <div key={color} className="flex flex-col items-center min-w-[48px]">
                             <GemToken color={color} count={gameState.players[1].gems[color]} size="small" />
                             <span className="text-xs text-gray-500 mt-1">{gameState.players[1].gems[color]}</span>
@@ -1369,7 +1368,7 @@ export default function SplendorGame() {
                     {/* Opponent Card Bonuses */}
                     <div>
                       <h4 className="font-semibold mb-2 text-sm text-gray-600">Bonus Kartu</h4>
-                      <div className="flex gap-1 overflow-x-auto pb-1 sm:grid sm:grid-cols-6 sm:overflow-x-visible sm:gap-2">
+                      <div className="grid grid-cols-5 gap-1 sm:grid-cols-6 sm:gap-2 pb-1">
                         {GEM_COLORS.map((color) => {
                           const count = gameState.players[1].cards.filter((card) => card.provides === color).length
                           return (
