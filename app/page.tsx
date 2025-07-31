@@ -1283,7 +1283,7 @@ export default function SplendorGame() {
                 {gameState.players[0].reservedCards.length}
               </span>
             </h4>
-            <div className="grid grid-cols-2 gap-2 justify-items-center">
+            <div className="grid grid-cols-3  lg:grid-cols-2 gap-2 justify-items-center">
               {gameState.players[0].reservedCards.map((card) => (
                 <div
                   key={card.id}
