@@ -230,19 +230,18 @@ w-32 h-36 relative
 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105
 ${animatingCardId === card.id ? "animate-pulse ring-2 ring-green-400" : ""}
 ${isReserved ? "border-blue-400 border-2" : ""}
-${
-  card.provides === "white"
-    ? "bg-gray-100"
-    : card.provides === "blue"
-      ? "bg-blue-100"
-      : card.provides === "green"
-        ? "bg-green-100"
-        : card.provides === "red"
-          ? "bg-red-100"
-          : card.provides === "black"
-            ? "bg-gray-700"
-            : ""
-}
+${card.provides === "white"
+        ? "bg-gray-100"
+        : card.provides === "blue"
+          ? "bg-blue-100"
+          : card.provides === "green"
+            ? "bg-green-100"
+            : card.provides === "red"
+              ? "bg-red-100"
+              : card.provides === "black"
+                ? "bg-gray-700"
+                : ""
+      }
 `}
   >
     <CardHeader className="p-2 pb-1">
@@ -316,9 +315,8 @@ const NobleComponent = ({ noble, playerBonuses }: { noble: Noble; playerBonuses:
 
   return (
     <Card
-      className={`w-28 h-28 relative bg-gradient-to-br from-purple-50 to-indigo-50 shadow-lg flex flex-col items-center justify-center p-2 transition-all duration-300 hover:scale-105 ${
-        canVisit ? "ring-2 ring-yellow-400" : "opacity-70"
-      }`}
+      className={`w-28 h-28 relative bg-gradient-to-br from-purple-50 to-indigo-50 shadow-lg flex flex-col items-center justify-center p-2 transition-all duration-300 hover:scale-105 ${canVisit ? "ring-2 ring-yellow-400" : "opacity-70"
+        }`}
     >
       <Crown className="w-6 h-6 text-purple-600 mb-1" />
       <Badge variant="secondary" className="bg-yellow-100 text-yellow-800 border-yellow-300 text-xs px-1 py-0 mb-2">
@@ -451,7 +449,7 @@ export default function SplendorGame() {
     const shuffled = [...array]
     for (let i = shuffled.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1))
-      ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+        ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
     }
     return shuffled
   }
@@ -1220,461 +1218,461 @@ export default function SplendorGame() {
           </Button>
         </div>
         {/* Bot Action Feedback */}
-        
+
         {/* Main Game Layout */}
         <div className="flex flex-col xl:grid xl:grid-cols-5 gap-4">
-  {/* Mobile: flex-row nobles, player, bot | Desktop: grid */}
-  <div className="flex flex-row gap-2 xl:flex-col xl:col-span-1 space-y-0 xl:space-y-4 sm:space-y-2 w-full">
-    {/* Nobles - tampil di paling kiri di mobile */}
-    <div className="w-1/3 xl:w-full block lg:hidden">
-      <Card className="shadow-lg bg-gradient-to-br from-white to-gray-50">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Crown className="w-6 h-6 text-purple-600" />
-            Para Raja
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="flex flex-wrap justify-center gap-3 p-4">
-          {gameState.availableNobles.map((noble) => (
-            <NobleComponent key={noble.id} noble={noble} playerBonuses={currentPlayerBonuses} />
-          ))}
-        </CardContent>
-      </Card>
-    </div>
-    {/* Player Card */}
-    <div className="w-1/3 xl:w-full">
-      <Card
-        className={`${gameState.currentPlayer === 0 ? "ring-2 ring-blue-600 bg-blue-100 animate-pulse" : "bg-white"} shadow-lg transition-all duration-800`}
-      >
-        <CardHeader className="pb-3">
-          <CardTitle className="flex items-center gap-2 text-lg">
-            {gameState.players[0].isBot ? <Bot className="w-5 h-5" /> : <User className="w-5 h-5" />}
-            {gameState.players[0].name}
-            <Badge className="bg-yellow-100 text-yellow-800 border-yellow-300">
-              <Star className="w-3 h-3 mr-1" />
-              {gameState.players[0].points}
-            </Badge>
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          {/* Player Gems */}
-          <div>
-            <h4 className="font-semibold mb-2 text-sm text-gray-600 flex items-center justify-between">
-              Permata
-              <span className="ml-2 text-xs text-gray-700 font-semibold">
-                Total: {getTotalGems(gameState.players[0].gems)}
-              </span>
-            </h4>
-            <div className="flex gap-2 overflow-x-auto pb-1 sm:grid sm:grid-cols-7 sm:overflow-x-visible sm:gap-3">
-              {[...GEM_COLORS, "gold" as const].map((color) => (
-                <div key={color} className="flex flex-col items-center min-w-[48px]">
-                  <GemToken color={color} count={gameState.players[0].gems[color]} size="small" />
-                  <span className="text-xs text-gray-500 mt-1">{gameState.players[0].gems[color]}</span>
-                </div>
-              ))}
+          {/* Mobile: flex-row nobles, player, bot | Desktop: grid */}
+          <div className="flex flex-row gap-2 xl:flex-col xl:col-span-1 space-y-0 xl:space-y-4 sm:space-y-2 w-full">
+            {/* Nobles - tampil di atas, full width di mobile */}
+            <div className="block w-full mb-2 lg:hidden mt-4">
+              <Card className="shadow-lg bg-gradient-to-br from-white to-gray-50">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Crown className="w-6 h-6 text-purple-600" />
+                    Para Raja
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="flex flex-wrap justify-center gap-3 p-4">
+                  {gameState.availableNobles.map((noble) => (
+                    <NobleComponent key={noble.id} noble={noble} playerBonuses={currentPlayerBonuses} />
+                  ))}
+                </CardContent>
+              </Card>
             </div>
-          </div>
-          {/* Player Card Bonuses */}
-          <div>
-            <h4 className="font-semibold mb-2 text-sm text-gray-600">Bonus Kartu</h4>
-            <div className="flex gap-1 overflow-x-auto pb-1 sm:grid sm:grid-cols-6 sm:overflow-x-visible sm:gap-2">
-              {GEM_COLORS.map((color) => {
-                const count = gameState.players[0].cards.filter((card) => card.provides === color).length
-                return (
-                  <div key={color} className="flex flex-col items-center min-w-[32px]">
-                    <div
-                      className={`w-5 h-5 rounded-full border ${getGemColor(color)} flex items-center justify-center text-xs font-bold transition-all duration-300 hover:scale-110`}
-                    >
-                      {count}
+            {/* Player & Bot Card - berdampingan di mobile, vertikal di desktop */}
+            <div className="grid grid-cols-2 lg:flex gap-2 lg:flex-col lg:col-span-1 w-full">
+              {/* Player Card */}
+              <div className="min-w-0 lg:w-full">
+                <Card
+                  className={`${gameState.currentPlayer === 0 ? "ring-2 ring-blue-600 bg-blue-100 animate-pulse" : "bg-white"} shadow-lg transition-all duration-800`}
+                >
+                  <CardHeader className="pb-3">
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      {gameState.players[0].isBot ? <Bot className="w-5 h-5" /> : <User className="w-5 h-5" />}
+                      {gameState.players[0].name}
+                      <Badge className="bg-yellow-100 text-yellow-800 border-yellow-300">
+                        <Star className="w-3 h-3 mr-1" />
+                        {gameState.players[0].points}
+                      </Badge>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    {/* Player Gems */}
+                    <div>
+                      <h4 className="font-semibold mb-2 text-sm text-gray-600 flex items-center justify-between">
+                        Permata
+                        <span className="ml-2 text-xs text-gray-700 font-semibold">
+                          Total: {getTotalGems(gameState.players[0].gems)}
+                        </span>
+                      </h4>
+                      <div className="flex gap-2 overflow-x-auto pb-1 sm:grid sm:grid-cols-7 sm:overflow-x-visible sm:gap-3">
+                        {[...GEM_COLORS, "gold" as const].map((color) => (
+                          <div key={color} className="flex flex-col items-center min-w-[48px]">
+                            <GemToken color={color} count={gameState.players[0].gems[color]} size="small" />
+                            <span className="text-xs text-gray-500 mt-1">{gameState.players[0].gems[color]}</span>
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                )
-              })}
-            </div>
-          </div>
-          {/* Reserved Cards */}
-          {gameState.players[0].reservedCards.length > 0 && (
-            <div>
-              <h4 className="font-semibold mb-2 text-sm text-gray-600 flex items-center gap-2">
-                Cadangan
-                <span className="bg-blue-100 text-blue-700 rounded px-2 py-0.5 text-xs font-semibold">
-                  {gameState.players[0].reservedCards.length}
-                </span>
-              </h4>
-              <div className="grid grid-cols-3  lg:grid-cols-2 gap-2 justify-items-center">
-                {gameState.players[0].reservedCards.map((card) => (
-                  <div
-                    key={card.id}
-                    className="relative hover:z-50 z-10 hover:scale-100 transition-all duration-200"
-                  >
-                    <DevelopmentCardComponent
-                      card={card}
-                      canBuy={canAffordCard(gameState.players[0], card)}
-                      onBuy={() => {
-                        setGameState((prev) => {
-                          const newState = buyReservedCardLogic(prev, gameState.currentPlayer, card)
-                          return {
-                            ...newState,
-                            currentPlayer: (newState.currentPlayer + 1) % 2,
-                            lastBotAction: null,
-                          }
-                        })
-                      }}
-                      showActions={!currentPlayer.isBot && !gameState.winner}
-                      animatingCardId={gameState.animatingCard}
-                      isReserved={true}
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-    </div>
-    {/* Bot Card */}
-    <div className="w-1/3 xl:w-full">
-      <Card
-        className={`${gameState.currentPlayer === 1 ? "ring-2 ring-blue-600 bg-blue-100 animate-pulse" : "bg-white"} shadow-lg transition-all duration-800`}
-      >
-        <CardHeader className="pb-3">
-          <CardTitle className="flex items-center gap-2 text-lg">
-            {gameState.players[1].isBot ? <Bot className="w-5 h-5" /> : <User className="w-5 h-5" />}
-            {gameState.players[1].name}
-            <Badge className="bg-yellow-100 text-yellow-800 border-yellow-300">
-              <Star className="w-3 h-3 mr-1" />
-              {gameState.players[1].points}
-            </Badge>
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          {/* Player Gems */}
-          <div>
-            <h4 className="font-semibold mb-2 text-sm text-gray-600 flex items-center justify-between">
-              Permata
-              <span className="ml-2 text-xs text-gray-700 font-semibold">
-                Total: {getTotalGems(gameState.players[1].gems)}
-              </span>
-            </h4>
-            <div className="flex gap-2 overflow-x-auto pb-1 sm:grid sm:grid-cols-7 sm:overflow-x-visible sm:gap-3">
-              {[...GEM_COLORS, "gold" as const].map((color) => (
-                <div key={color} className="flex flex-col items-center min-w-[48px]">
-                  <GemToken color={color} count={gameState.players[1].gems[color]} size="small" />
-                  <span className="text-xs text-gray-500 mt-1">{gameState.players[1].gems[color]}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-          {/* Opponent Card Bonuses */}
-          <div>
-            <h4 className="font-semibold mb-2 text-sm text-gray-600">Bonus Kartu</h4>
-            <div className="flex gap-1 overflow-x-auto pb-1 sm:grid sm:grid-cols-6 sm:overflow-x-visible sm:gap-2">
-              {GEM_COLORS.map((color) => {
-                const count = gameState.players[1].cards.filter((card) => card.provides === color).length
-                return (
-                  <div key={color} className="flex flex-col items-center min-w-[32px]">
-                    <div
-                      className={`w-5 h-5 rounded-full border ${getGemColor(color)} flex items-center justify-center text-xs font-bold transition-all duration-300 hover:scale-110`}
-                    >
-                      {count}
+                    {/* Player Card Bonuses */}
+                    <div>
+                      <h4 className="font-semibold mb-2 text-sm text-gray-600">Bonus Kartu</h4>
+                      <div className="flex gap-1 overflow-x-auto pb-1 sm:grid sm:grid-cols-6 sm:overflow-x-visible sm:gap-2">
+                        {GEM_COLORS.map((color) => {
+                          const count = gameState.players[0].cards.filter((card) => card.provides === color).length
+                          return (
+                            <div key={color} className="flex flex-col items-center min-w-[32px]">
+                              <div
+                                className={`w-5 h-5 rounded-full border ${getGemColor(color)} flex items-center justify-center text-xs font-bold transition-all duration-300 hover:scale-110`}
+                              >
+                                {count}
+                              </div>
+                            </div>
+                          )
+                        })}
+                      </div>
                     </div>
-                  </div>
-                )
-              })}
-            </div>
-          </div>
-          {/* Opponent Reserved Cards */}
-          {gameState.players[1].reservedCards.length > 0 && (
-            <div>
-              <h4 className="font-semibold mb-2 text-sm text-gray-600 flex items-center gap-2">
-                Cadangan
-                <span className="bg-blue-100 text-blue-700 rounded px-2 py-0.5 text-xs font-semibold">
-                  {gameState.players[1].reservedCards.length}
-                </span>
-              </h4>
-              <div className="grid grid-cols-2 gap-2 justify-items-center">
-                {gameState.players[1].reservedCards.map((card) => (
-                  <DevelopmentCardComponent
-                    key={card.id}
-                    card={card}
-                    canBuy={canAffordCard(gameState.players[1], card)}
-                    onBuy={() => {
-                      setGameState((prev) => {
-                        const newState = buyReservedCardLogic(prev, gameState.currentPlayer, card)
-                        return {
-                          ...newState,
-                          currentPlayer: (newState.currentPlayer + 1) % 2,
-                          lastBotAction: null,
-                        }
-                      })
-                    }}
-                    showActions={!currentPlayer.isBot && !gameState.winner}
-                    animatingCardId={gameState.animatingCard}
-                    isReserved={true}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-    </div>
-  </div>
-  {/* Game Board - Development Cards */}
-  <div className="xl:col-span-3 sm:col-span-1">
-    {" "}
-    {/* Changed xl:col-span-2 to xl:col-span-3 */}
-    <Card className="shadow-lg bg-gradient-to-br from-white to-gray-50">
-      <CardContent className="space-y-6 mt-4">
-        {/* Development Cards */}
-        <div className="space-y-4">
-          {(["tier3", "tier2", "tier1"] as const).map((tier) => (
-            <div key={tier}>
-              <h4 className="font-semibold text-2xl mb-3 flex items-center gap-2">
-                <Diamond className="w-5 h-5 text-blue-600" />
-                {tier === "tier3" ? "Tingkat 3" : tier === "tier2" ? "Tingkat 2" : "Tingkat 1"}
-              </h4>
-              <div className="flex items-end gap-4 pb-2 justify-center">
-                {/* Deck Counter */}
-                <DeckCounter
-                  count={gameState.decks[tier].length}
-                />
-                {/* Card Slots */}
-                {gameState.availableCards[tier].map((card, index) => {
-                  // Cek apakah card ini sudah di-reserved oleh siapapun
-                  const isReservedByAnyone =
-                    card &&
-                    gameState.players.some((player) =>
-                      player.reservedCards.some((reserved) => reserved.id === card.id)
-                    )
-
-                  return (
-                    <div key={card ? card.id : `empty-${tier}-${index}`} className="flex-shrink-0">
-                      <CardSlot
-                        card={isReservedByAnyone ? null : card}
-                        tier={tier}
-                        canBuy={card && !isReservedByAnyone ? canAffordCard(currentPlayer, card) : false}
-                        onBuy={
-                          card && !isReservedByAnyone
-                            ? () => {
-                                setGameState((prev) => {
-                                  const newState = buyCardLogic(prev, gameState.currentPlayer, card, tier, index)
-                                  return {
-                                    ...newState,
-                                    currentPlayer: (newState.currentPlayer + 1) % 2,
-                                    lastBotAction: null,
-                                  }
-                                })
-                              }
-                            : undefined
-                        }
-                        onReserve={
-                          card && !isReservedByAnyone
-                            ? () => {
-                                if (gameState.gems.gold > 0) {
+                    {/* Reserved Cards */}
+                    {gameState.players[0].reservedCards.length > 0 && (
+                      <div>
+                        <h4 className="font-semibold mb-2 text-sm text-gray-600 flex items-center gap-2">
+                          Cadangan
+                          <span className="bg-blue-100 text-blue-700 rounded px-2 py-0.5 text-xs font-semibold">
+                            {gameState.players[0].reservedCards.length}
+                          </span>
+                        </h4>
+                        <div className="grid grid-cols-3  lg:grid-cols-2 gap-2 justify-items-center">
+                          {gameState.players[0].reservedCards.map((card) => (
+                            <div
+                              key={card.id}
+                              className="relative hover:z-50 z-10 hover:scale-100 transition-all duration-200"
+                            >
+                              <DevelopmentCardComponent
+                                card={card}
+                                canBuy={canAffordCard(gameState.players[0], card)}
+                                onBuy={() => {
                                   setGameState((prev) => {
-                                    const newState = reserveCardLogic(
-                                      prev,
-                                      gameState.currentPlayer,
-                                      card,
-                                      tier,
-                                      index,
-                                    )
+                                    const newState = buyReservedCardLogic(prev, gameState.currentPlayer, card)
                                     return {
                                       ...newState,
                                       currentPlayer: (newState.currentPlayer + 1) % 2,
                                       lastBotAction: null,
                                     }
                                   })
-                                }
-                              }
-                            : undefined
-                        }
-                        showActions={!currentPlayer.isBot && !gameState.winner}
-                        animatingCardId={gameState.animatingCard}
-                        index={index}
-                      />
+                                }}
+                                showActions={!currentPlayer.isBot && !gameState.winner}
+                                animatingCardId={gameState.animatingCard}
+                                isReserved={true}
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
+              {/* Bot Card */}
+              <div className="min-w-0 lg:w-full">
+                <Card
+                  className={`${gameState.currentPlayer === 1 ? "ring-2 ring-blue-600 bg-blue-100 animate-pulse" : "bg-white"} shadow-lg transition-all duration-800`}
+                >
+                  <CardHeader className="pb-3">
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      {gameState.players[1].isBot ? <Bot className="w-5 h-5" /> : <User className="w-5 h-5" />}
+                      {gameState.players[1].name}
+                      <Badge className="bg-yellow-100 text-yellow-800 border-yellow-300">
+                        <Star className="w-3 h-3 mr-1" />
+                        {gameState.players[1].points}
+                      </Badge>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    {/* Player Gems */}
+                    <div>
+                      <h4 className="font-semibold mb-2 text-sm text-gray-600 flex items-center justify-between">
+                        Permata
+                        <span className="ml-2 text-xs text-gray-700 font-semibold">
+                          Total: {getTotalGems(gameState.players[1].gems)}
+                        </span>
+                      </h4>
+                      <div className="flex gap-2 overflow-x-auto pb-1 sm:grid sm:grid-cols-7 sm:overflow-x-visible sm:gap-3">
+                        {[...GEM_COLORS, "gold" as const].map((color) => (
+
+                          <div key={color} className="flex flex-col items-center min-w-[48px]">
+                            <GemToken color={color} count={gameState.players[1].gems[color]} size="small" />
+                            <span className="text-xs text-gray-500 mt-1">{gameState.players[1].gems[color]}</span>
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                  )
-                })}
+                    {/* Opponent Card Bonuses */}
+                    <div>
+                      <h4 className="font-semibold mb-2 text-sm text-gray-600">Bonus Kartu</h4>
+                      <div className="flex gap-1 overflow-x-auto pb-1 sm:grid sm:grid-cols-6 sm:overflow-x-visible sm:gap-2">
+                        {GEM_COLORS.map((color) => {
+                          const count = gameState.players[1].cards.filter((card) => card.provides === color).length
+                          return (
+                            <div key={color} className="flex flex-col items-center min-w-[32px]">
+                              <div
+                                className={`w-5 h-5 rounded-full border ${getGemColor(color)} flex items-center justify-center text-xs font-bold transition-all duration-300 hover:scale-110`}
+                              >
+                                {count}
+                              </div>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    </div>
+                    {/* Opponent Reserved Cards */}
+                    {gameState.players[1].reservedCards.length > 0 && (
+                      <div>
+                        <h4 className="font-semibold mb-2 text-sm text-gray-600 flex items-center gap-2">
+                          Cadangan
+                          <span className="bg-blue-100 text-blue-700 rounded px-2 py-0.5 text-xs font-semibold">
+                            {gameState.players[1].reservedCards.length}
+                          </span>
+                        </h4>
+                        <div className="grid grid-cols-2 gap-2 justify-items-center">
+                          {gameState.players[1].reservedCards.map((card) => (
+                            <DevelopmentCardComponent
+                              key={card.id}
+                              card={card}
+                              canBuy={canAffordCard(gameState.players[1], card)}
+                              onBuy={() => {
+                                setGameState((prev) => {
+                                  const newState = buyReservedCardLogic(prev, gameState.currentPlayer, card)
+                                  return {
+                                    ...newState,
+                                    currentPlayer: (newState.currentPlayer + 1) % 2,
+                                    lastBotAction: null,
+                                  }
+                                })
+                              }}
+                              showActions={!currentPlayer.isBot && !gameState.winner}
+                              animatingCardId={gameState.animatingCard}
+                              isReserved={true}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
               </div>
             </div>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
-    {/* Gem Supply and Taking - Returned to its original position below development cards */}
-    <Card className="shadow-lg bg-white mt-4">
-      {" "}
-      {/* Added mt-4 for spacing */}
-      <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2">
-          <Coins className="w-6 h-6 text-yellow-600" />
-          Persediaan Permata & Aksi
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        {/* Available Gems */}
-        <div className="mb-4">
-          <div className="flex gap-3 justify-center">
-            {[...GEM_COLORS, "gold" as const].map((color) => (
-              <div key={color} className="text-center">
-                <GemToken color={color} count={gameState.gems[color]} size="large" />
-                <p className="text-xs text-gray-600 mt-1 font-medium">Persediaan: {gameState.gems[color]}</p>
-              </div>
-            ))}
           </div>
-        </div>
-        {/* Gem Taking Interface */}
-        {!currentPlayer.isBot && !gameState.winner && (
-          <div className="bg-blue-50 p-4 rounded-lg border-2 border-dashed border-blue-300">
-            <h5 className="font-semibold mb-3 text-center text-blue-700">Pilih Permata untuk Diambil</h5>
-            {/* Selected Gems Display (clickable GemTokens) */}
-            <div className="flex gap-2 justify-center mb-4">
-              {GEM_COLORS.map((color) => (
-                <div key={color} className="text-center">
-                  <button
-                    type="button"
-                    className={`
+          {/* Game Board - Development Cards */}
+          <div className="xl:col-span-3 sm:col-span-1">
+            {" "}
+            {/* Changed xl:col-span-2 to xl:col-span-3 */}
+            <Card className="shadow-lg bg-gradient-to-br from-white to-gray-50">
+              <CardContent className="space-y-6 mt-4">
+                {/* Development Cards */}
+                <div className="space-y-4">
+                  {(["tier3", "tier2", "tier1"] as const).map((tier) => (
+                    <div key={tier}>
+                      <h4 className="font-semibold text-2xl mb-3 flex items-center gap-2">
+                        <Diamond className="w-5 h-5 text-blue-600" />
+                        {tier === "tier3" ? "Tingkat 3" : tier === "tier2" ? "Tingkat 2" : "Tingkat 1"}
+                      </h4>
+                      <div className="flex items-end gap-4 pb-2 justify-center">
+                        {/* Deck Counter */}
+                        <DeckCounter
+                          count={gameState.decks[tier].length}
+                        />
+                        {/* Card Slots */}
+                        {gameState.availableCards[tier].map((card, index) => {
+                          // Cek apakah card ini sudah di-reserved oleh siapapun
+                          const isReservedByAnyone =
+                            card &&
+                            gameState.players.some((player) =>
+                              player.reservedCards.some((reserved) => reserved.id === card.id)
+                            )
+
+                          return (
+                            <div key={card ? card.id : `empty-${tier}-${index}`} className="flex-shrink-0">
+                              <CardSlot
+                                card={isReservedByAnyone ? null : card}
+                                tier={tier}
+                                canBuy={card && !isReservedByAnyone ? canAffordCard(currentPlayer, card) : false}
+                                onBuy={
+                                  card && !isReservedByAnyone
+                                    ? () => {
+                                      setGameState((prev) => {
+                                        const newState = buyCardLogic(prev, gameState.currentPlayer, card, tier, index)
+                                        return {
+                                          ...newState,
+                                          currentPlayer: (newState.currentPlayer + 1) % 2,
+                                          lastBotAction: null,
+                                        }
+                                      })
+                                    }
+                                    : undefined
+                                }
+                                onReserve={
+                                  card && !isReservedByAnyone
+                                    ? () => {
+                                      if (gameState.gems.gold > 0) {
+                                        setGameState((prev) => {
+                                          const newState = reserveCardLogic(
+                                            prev,
+                                            gameState.currentPlayer,
+                                            card,
+                                            tier,
+                                            index,
+                                          )
+                                          return {
+                                            ...newState,
+                                            currentPlayer: (newState.currentPlayer + 1) % 2,
+                                            lastBotAction: null,
+                                          }
+                                        })
+                                      }
+                                    }
+                                    : undefined
+                                }
+                                showActions={!currentPlayer.isBot && !gameState.winner}
+                                animatingCardId={gameState.animatingCard}
+                                index={index}
+                              />
+                            </div>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+            {/* Gem Supply and Taking - Returned to its original position below development cards */}
+            <Card className="shadow-lg bg-white mt-4">
+              {" "}
+              {/* Added mt-4 for spacing */}
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center gap-2">
+                  <Coins className="w-6 h-6 text-yellow-600" />
+                  Persediaan Permata & Aksi
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {/* Available Gems */}
+                <div className="mb-4">
+                  <div className="flex gap-3 justify-center">
+                    {[...GEM_COLORS, "gold" as const].map((color) => (
+                      <div key={color} className="text-center">
+                        <GemToken color={color} count={gameState.gems[color]} size="large" />
+                        <p className="text-xs text-gray-600 mt-1 font-medium">Persediaan: {gameState.gems[color]}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                {/* Gem Taking Interface */}
+                {!currentPlayer.isBot && !gameState.winner && (
+                  <div className="bg-blue-50 p-4 rounded-lg border-2 border-dashed border-blue-300">
+                    <h5 className="font-semibold mb-3 text-center text-blue-700">Pilih Permata untuk Diambil</h5>
+                    {/* Selected Gems Display (clickable GemTokens) */}
+                    <div className="flex gap-2 justify-center mb-4">
+                      {GEM_COLORS.map((color) => (
+                        <div key={color} className="text-center">
+                          <button
+                            type="button"
+                            className={`
                         relative flex flex-col items-center justify-center p-1 rounded-full
                         ${gameState.gems[color] === 0 ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}
                         ${gameState.selectedGems[color] > 0 ? "" : ""}
                         transition-all duration-200
                       `}
-                    onClick={() => updateSelectedGems(color)}
-                    disabled={gameState.gems[color] === 0}
-                  >
-                    <GemToken color={color} count={gameState.selectedGems[color]} size="normal" />
-                    <p className="text-xs text-gray-600 mt-1">Dipilih: {gameState.selectedGems[color]}</p>
-                  </button>
-                </div>
-              ))}
+                            onClick={() => updateSelectedGems(color)}
+                            disabled={gameState.gems[color] === 0}
+                          >
+                            <GemToken color={color} count={gameState.selectedGems[color]} size="normal" />
+                            <p className="text-xs text-gray-600 mt-1">Dipilih: {gameState.selectedGems[color]}</p>
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                    {/* Rules Display */}
+                    <div className="text-xs text-gray-600 mb-3 bg-white p-2 rounded">
+                      <p className="font-semibold mb-1">Aturan:</p>
+                      <ul className="list-disc list-inside space-y-1">
+                        <li>Ambil hingga 3 permata warna berbeda, ATAU</li>
+                        <li>Ambil 2 permata warna sama (jika tersedia 4+)</li>
+                        <li>Tidak bisa dicampur: jika ambil 2 warna sama, tidak bisa ambil lainnya</li>
+                        <li>Total permata tidak boleh lebih dari 10</li>
+                      </ul>
+                    </div>
+                    {/* Action Buttons */}
+                    <div className="flex gap-2 justify-center">
+                      <Button
+                        onClick={() => {
+                          setGameState((prev) => {
+                            const newState = takeGemsLogic(prev, gameState.currentPlayer, gameState.selectedGems)
+                            gemCollectSound.current?.play() // Play sound
+                            return {
+                              ...newState,
+                              currentPlayer: (newState.currentPlayer + 1) % 2,
+                              lastBotAction: null,
+                            }
+                          })
+                        }}
+                        disabled={
+                          !canTakeSelectedGems() ||
+                          getTotalGems(currentPlayer.gems) +
+                          Object.values(gameState.selectedGems).reduce((a, b) => a + b, 0) >
+                          10
+                        }
+                        className="bg-green-600 hover:bg-green-700 transition-all duration-200 transform hover:scale-105"
+                      >
+                        <Gem className="w-4 h-4 mr-2" />
+                        Ambil Permata Terpilih
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={() =>
+                          setGameState((prev) => ({
+                            ...prev,
+                            selectedGems: { white: 0, blue: 0, green: 0, red: 0, black: 0 },
+                          }))
+                        }
+                        disabled={Object.values(gameState.selectedGems).every((count) => count === 0)}
+                        className="transition-all duration-200 hover:scale-105"
+                      >
+                        Hapus Pilihan
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+          {/* Nobles Column */}
+          <div className="xl:col-span-1 sm:col-span-1 hidden lg:block">
+            <Card className="shadow-lg bg-gradient-to-br from-white to-gray-50">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Crown className="w-6 h-6 text-purple-600" />
+                  Para Raja
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="flex flex-wrap justify-center gap-3 p-4">
+                {gameState.availableNobles.map((noble) => (
+                  <NobleComponent key={noble.id} noble={noble} playerBonuses={currentPlayerBonuses} />
+                ))}
+              </CardContent>
+            </Card>
+            <p className="text-center text-sm text-gray-500 mt-8 nothint">
+              Made with <span className=" hint text-gray-100">♥</span> by{" "}
+              <span className="hint text-gray-100">rizal</span>
+            </p>
+          </div>
+        </div>
+      </div>
+      {gameState.winner !== null && (
+        <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/40">
+          <div className="bg-white rounded-xl shadow-2xl p-8 max-w-xs w-full text-center animate-fade-in">
+            <Trophy className="w-12 h-12 mx-auto text-yellow-500 mb-2" />
+            <h2 className="text-2xl font-bold mb-2">
+              {gameState.players[gameState.winner].id === 0 ? "Anda Menang!" : gameState.players[gameState.winner].isBot ? "Bot Menang!" : "Pemain 2 Menang!"}
+            </h2>
+            <div className="mb-4">
+              <p className="font-semibold mb-1">Skor Akhir:</p>
+              <div className="flex flex-col gap-2">
+                {gameState.players.map((p, i) => (
+                  <div key={p.id} className={`flex items-center justify-between px-4 py-1 rounded ${i === gameState.winner ? "bg-green-100 font-bold" : "bg-gray-100"}`}>
+                    <span>
+                      {p.isBot ? <Bot className="inline w-4 h-4 mr-1" /> : <User className="inline w-4 h-4 mr-1" />}
+                      {p.name}
+                    </span>
+                    <span className="text-lg">{p.points} <Star className="inline w-4 h-4 text-yellow-500" /></span>
+                  </div>
+                ))}
+              </div>
             </div>
-            {/* Rules Display */}
-            <div className="text-xs text-gray-600 mb-3 bg-white p-2 rounded">
-              <p className="font-semibold mb-1">Aturan:</p>
-              <ul className="list-disc list-inside space-y-1">
-                <li>Ambil hingga 3 permata warna berbeda, ATAU</li>
-                <li>Ambil 2 permata warna sama (jika tersedia 4+)</li>
-                <li>Tidak bisa dicampur: jika ambil 2 warna sama, tidak bisa ambil lainnya</li>
-                <li>Total permata tidak boleh lebih dari 10</li>
-              </ul>
-            </div>
-            {/* Action Buttons */}
-            <div className="flex gap-2 justify-center">
+            <div className="flex gap-2 mt-4 justify-center">
               <Button
-                onClick={() => {
-                  setGameState((prev) => {
-                    const newState = takeGemsLogic(prev, gameState.currentPlayer, gameState.selectedGems)
-                    gemCollectSound.current?.play() // Play sound
-                    return {
-                      ...newState,
-                      currentPlayer: (newState.currentPlayer + 1) % 2,
-                      lastBotAction: null,
-                    }
-                  })
-                }}
-                disabled={
-                  !canTakeSelectedGems() ||
-                  getTotalGems(currentPlayer.gems) +
-                    Object.values(gameState.selectedGems).reduce((a, b) => a + b, 0) >
-                    10
-                }
-                className="bg-green-600 hover:bg-green-700 transition-all duration-200 transform hover:scale-105"
+                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+                onClick={() => initializeGame(gameState.gameMode === "pve" ? "pve" : "pvp")}
               >
-                <Gem className="w-4 h-4 mr-2" />
-                Ambil Permata Terpilih
+                Main Lagi
               </Button>
               <Button
-                variant="outline"
-                onClick={() =>
-                  setGameState((prev) => ({
-                    ...prev,
-                    selectedGems: { white: 0, blue: 0, green: 0, red: 0, black: 0 },
-                  }))
-                }
-                disabled={Object.values(gameState.selectedGems).every((count) => count === 0)}
-                className="transition-all duration-200 hover:scale-105"
+                className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700"
+                onClick={() => setGameState(initialGameState)}
               >
-                Hapus Pilihan
+                Kembali ke Menu
               </Button>
             </div>
           </div>
-        )}
-      </CardContent>
-    </Card>
-  </div>
-  {/* Nobles Column */}
-  <div className="xl:col-span-1 sm:col-span-1 hidden lg:block">
-    <Card className="shadow-lg bg-gradient-to-br from-white to-gray-50">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Crown className="w-6 h-6 text-purple-600" />
-          Para Raja
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="flex flex-wrap justify-center gap-3 p-4">
-        {gameState.availableNobles.map((noble) => (
-          <NobleComponent key={noble.id} noble={noble} playerBonuses={currentPlayerBonuses} />
-        ))}
-      </CardContent>
-    </Card>
-    <p className="text-center text-sm text-gray-500 mt-8 nothint">
-      Made with <span className=" hint text-gray-100">♥</span> by{" "}
-      <span className="hint text-gray-100">rizal</span>
-    </p>
-  </div>
-</div>
-      </div>
-      {gameState.winner !== null && (
-  <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/40">
-    <div className="bg-white rounded-xl shadow-2xl p-8 max-w-xs w-full text-center animate-fade-in">
-      <Trophy className="w-12 h-12 mx-auto text-yellow-500 mb-2" />
-      <h2 className="text-2xl font-bold mb-2">
-        {gameState.players[gameState.winner].id === 0 ? "Anda Menang!" : gameState.players[gameState.winner].isBot ? "Bot Menang!" : "Pemain 2 Menang!"}
-      </h2>
-      <div className="mb-4">
-        <p className="font-semibold mb-1">Skor Akhir:</p>
-        <div className="flex flex-col gap-2">
-          {gameState.players.map((p, i) => (
-            <div key={p.id} className={`flex items-center justify-between px-4 py-1 rounded ${i === gameState.winner ? "bg-green-100 font-bold" : "bg-gray-100"}`}>
-              <span>
-                {p.isBot ? <Bot className="inline w-4 h-4 mr-1" /> : <User className="inline w-4 h-4 mr-1" />}
-                {p.name}
-              </span>
-              <span className="text-lg">{p.points} <Star className="inline w-4 h-4 text-yellow-500" /></span>
-            </div>
-          ))}
         </div>
-      </div>
-      <div className="flex gap-2 mt-4 justify-center">
-        <Button
-          className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
-          onClick={() => initializeGame(gameState.gameMode === "pve" ? "pve" : "pvp")}
-        >
-          Main Lagi
-        </Button>
-        <Button
-          className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700"
-          onClick={() => setGameState(initialGameState)}
-        >
-          Kembali ke Menu
-        </Button>
-      </div>
-    </div>
-  </div>
-)}
+      )}
       <style jsx>{`
   @media (max-width: 640px) {
     .max-w-7xl {
       max-width: 100vw;
       padding: 0 2px;
     }
-    .grid {
-      display: flex;
-      flex-direction: column;
-      gap: 8px !important;
-    }
+
     .xl\\:col-span-1, .xl\\:col-span-2, .xl\\:col-span-3 { /* Added xl:col-span-3 */
       width: 100% !important;
       grid-column: span 1 / span 1 !important;
