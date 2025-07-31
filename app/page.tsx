@@ -342,7 +342,7 @@ const NobleComponent = ({ noble, playerBonuses }: { noble: Noble; playerBonuses:
 
 // New: Empty Card Slot Component
 const EmptyCardSlot = () => (
-  <Card className="w-32 h-36 relative shadow-inner bg-gray-200 flex items-center justify-center text-gray-500 text-sm border-dashed border-gray-400">
+<Card className="w-20 h-24 sm:w-32 sm:h-36 relative shadow-inner bg-gray-200 flex items-center justify-center text-gray-500 text-xs border-dashed border-gray-400">
     {" "}
     {/* Changed h-34 to h-36 */}
     Slot Kosong
@@ -1226,12 +1226,7 @@ export default function SplendorGame() {
             {/* Nobles - tampil di atas, full width di mobile */}
             <div className="block w-full mb-2 lg:hidden mt-4">
               <Card className="shadow-lg bg-gradient-to-br from-white to-gray-50">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Crown className="w-6 h-6 text-purple-600" />
-                    Para Raja
-                  </CardTitle>
-                </CardHeader>
+
                 <CardContent className="flex flex-wrap justify-center gap-3 p-4">
                   {gameState.availableNobles.map((noble) => (
                     <NobleComponent key={noble.id} noble={noble} playerBonuses={currentPlayerBonuses} />
@@ -1425,16 +1420,12 @@ export default function SplendorGame() {
           <div className="xl:col-span-3 sm:col-span-1">
             {" "}
             {/* Changed xl:col-span-2 to xl:col-span-3 */}
-            <Card className="shadow-lg bg-gradient-to-br from-white to-gray-50">
+            <Card className="shadow-lg bg-gradient-to-br from-white to-gray-50 w-full max-w-full sm:max-w-3xl mx-auto p-2 sm:p-4">
               <CardContent className="space-y-6 mt-4">
                 {/* Development Cards */}
                 <div className="space-y-4">
                   {(["tier3", "tier2", "tier1"] as const).map((tier) => (
                     <div key={tier}>
-                      <h4 className="font-semibold text-2xl mb-3 flex items-center gap-2">
-                        <Diamond className="w-5 h-5 text-blue-600" />
-                        {tier === "tier3" ? "Tingkat 3" : tier === "tier2" ? "Tingkat 2" : "Tingkat 1"}
-                      </h4>
                       <div className="flex items-end gap-4 pb-2 justify-center">
                         {/* Deck Counter */}
                         <DeckCounter
@@ -1608,12 +1599,6 @@ export default function SplendorGame() {
           {/* Nobles Column */}
           <div className="xl:col-span-1 sm:col-span-1 hidden lg:block">
             <Card className="shadow-lg bg-gradient-to-br from-white to-gray-50">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Crown className="w-6 h-6 text-purple-600" />
-                  Para Raja
-                </CardTitle>
-              </CardHeader>
               <CardContent className="flex flex-wrap justify-center gap-3 p-4">
                 {gameState.availableNobles.map((noble) => (
                   <NobleComponent key={noble.id} noble={noble} playerBonuses={currentPlayerBonuses} />
