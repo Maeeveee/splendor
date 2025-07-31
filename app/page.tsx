@@ -252,8 +252,8 @@ ${card.provides === "white"
           {getGemIcon(card.provides)}
         </div>
         {card.points > 0 && (
-          <Badge variant="secondary" className="bg-yellow-100 text-yellow-800 border-yellow-300 text-xs px-1 py-0">
-            <Star className="w-2 h-2 mr-1" />
+          <Badge variant="secondary" className="bg-yellow-100 text-yellow-800 border-yellow-300 text-sm px-1 py-0">
+            <Star className="w-3 h-3 mr-1" />
             {card.points}
           </Badge>
         )}
@@ -263,7 +263,7 @@ ${card.provides === "white"
       {" "}
       {/* Changed pb-8 to pb-4 */}
       <div className="space-y-1">
-        <div className={`text-xs font-semibold mb-1 ${card.provides === "black" ? "text-white" : "text-gray-600"}`}>
+        <div className={`text-sm font-semibold mb-1 ${card.provides === "black" ? "text-white" : "text-gray-600"}`}>
           Biaya:
         </div>
         <div className="grid grid-cols-2 gap-x-2 gap-y-1 max-h-20 overflow-y-auto">
@@ -274,7 +274,7 @@ ${card.provides === "white"
                   <div className={`w-3 h-3 rounded-full border ${getGemColor(color)} flex items-center justify-center`}>
                     {getGemIcon(color)}
                   </div>
-                  <span className={`text-xs font-medium ${card.provides === "black" ? "text-white" : "text-gray-700"}`}>
+                  <span className={`text-sm font-medium ${card.provides === "black" ? "text-white" : "text-gray-700"}`}>
                     {card.cost[color]}
                   </span>
                 </div>
@@ -1003,30 +1003,31 @@ export default function SplendorGame() {
       const differentColorsBeforeClick = Object.values(newSelected).filter((val) => val > 0).length
       let nextValue: number
       if (currentSelectedCount === 0) {
-        // If currently 0, try to select 1
         nextValue = 1
       } else if (currentSelectedCount === 1) {
-        // If currently 1, check if it's part of a 2-different or 3-different gem selection
         if (differentColorsBeforeClick === 2 && totalSelectedBeforeClick === 2) {
-          // Case: {colorA:1, colorB:1} and colorA is clicked -> deselect colorA
           nextValue = 0
         } else if (differentColorsBeforeClick === 3 && totalSelectedBeforeClick === 3) {
-          // Case: {colorA:1, colorB:1, colorC:1} and colorA is clicked -> deselect colorA
           nextValue = 0
         } else {
-          // If it's 1 and not part of a "full" set of different gems, cycle to 2
           nextValue = 2
         }
       } else {
-        // currentSelectedCount === 2
-        // If currently 2, deselect
         nextValue = 0
       }
-      // Calculate potential new state for validation
+
+      // Tambahan: Jika sudah ada warna lain yang dipilih 2, tidak boleh pilih warna lain
+      const alreadyTwoOfSame = Object.entries(newSelected).some(
+        ([k, v]) => v === 2 && k !== color
+      )
+      if (alreadyTwoOfSame && currentSelectedCount === 0) {
+        return prev
+      }
+
+      // ...lanjutan validasi seperti sebelumnya...
       const tempSelected = { ...newSelected, [color]: nextValue }
       const totalSelectedAfterClick = Object.values(tempSelected).reduce((sum, val) => sum + val, 0)
       const differentColorsAfterClick = Object.values(tempSelected).filter((val) => val > 0).length
-      // Validation for adding gems (if nextValue > 0)
       if (nextValue > 0) {
         // Rule 3: Cannot take more than 3 total gems
         if (totalSelectedAfterClick > 3) return prev
@@ -1043,7 +1044,6 @@ export default function SplendorGame() {
           return prev
         }
       }
-      // If all validations pass, update selected gems
       newSelected[color] = nextValue
       return { ...prev, selectedGems: newSelected }
     })
