@@ -1739,7 +1739,10 @@ export default function SplendorGame() {
               </Button>
               <Button
                 className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700"
-                onClick={() => setGameState(initialGameState)}
+                onClick={() => {
+                  setGameState(initialGameState)
+                  setPendingMode(null)
+                }}
               >
                 Kembali ke Menu
               </Button>
