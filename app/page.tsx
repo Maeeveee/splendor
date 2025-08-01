@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useCallback, useRef } from "react"
+import { useState, useEffect, useRef, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -315,8 +315,7 @@ const NobleComponent = ({ noble, playerBonuses }: { noble: Noble; playerBonuses:
 
   return (
     <Card
-      className={`w-28 h-28 relative bg-gradient-to-br from-purple-50 to-indigo-50 shadow-lg flex flex-col items-center justify-center p-2 transition-all duration-300 hover:scale-105 ${canVisit ? "ring-2 ring-yellow-400" : "opacity-70"
-        }`}
+      className={`w-28 h-28 relative bg-gradient-to-br from-purple-50 to-indigo-50 shadow-lg flex flex-col items-center justify-center p-2 transition-all duration-300 hover:scale-105 ${canVisit ? "ring-2 ring-yellow-400" : "opacity-70"}`}
     >
       <Crown className="w-6 h-6 text-purple-600 mb-1" />
       <Badge variant="secondary" className="bg-yellow-100 text-yellow-800 border-yellow-300 text-xs px-1 py-0 mb-2">
@@ -342,7 +341,7 @@ const NobleComponent = ({ noble, playerBonuses }: { noble: Noble; playerBonuses:
 
 // New: Empty Card Slot Component
 const EmptyCardSlot = () => (
-<Card className="w-20 h-24 sm:w-32 sm:h-36 relative shadow-inner bg-gray-200 flex items-center justify-center text-gray-500 text-xs border-dashed border-gray-400">
+  <Card className="w-20 h-24 sm:w-32 sm:h-36 relative shadow-inner bg-gray-200 flex items-center justify-center text-gray-500 text-xs border-dashed border-gray-400">
     {" "}
     {/* Changed h-34 to h-36 */}
     Slot Kosong
@@ -451,7 +450,24 @@ export default function SplendorGame() {
     return shuffled
   }
 
-  const initializeGame = (mode: "pvp" | "pve") => {
+  // Tambah state untuk nama & mode pilihan
+  const [pendingMode, setPendingMode] = useState<"pvp" | "pve" | null>(null)
+  const [nameInputs, setNameInputs] = useState<{ p1: string; p2: string }>({ p1: "", p2: "" })
+
+  // Muat nama dari localStorage (jika ada)
+  useEffect(() => {
+    const stored = localStorage.getItem("splendorNames")
+    if (stored) setNameInputs(JSON.parse(stored))
+  }, [])
+
+  // Ubah initializeGame agar menerima nama dan simpan ke localStorage
+  const initializeGame = (mode: "pvp" | "pve", name1?: string, name2?: string) => {
+    const p1 = name1?.trim() || (mode === "pve" ? nameInputs.p1 || "Kamu" : nameInputs.p1 || "Pemain 1")
+    const p2 = mode === "pve" ? "" : name2?.trim() || nameInputs.p2 || "Pemain 2"
+
+    // Simpan nama ke localStorage
+    localStorage.setItem("splendorNames", JSON.stringify({ p1, p2 }))
+
     const shuffledTier1 = shuffleArray(DEVELOPMENT_CARDS.tier1)
     const shuffledTier2 = shuffleArray(DEVELOPMENT_CARDS.tier2)
     const shuffledTier3 = shuffleArray(DEVELOPMENT_CARDS.tier3)
@@ -460,7 +476,7 @@ export default function SplendorGame() {
     const players: Player[] = [
       {
         id: 0,
-        name: "Kamu",
+        name: p1,
         isBot: false,
         gems: { white: 0, blue: 0, green: 0, red: 0, black: 0, gold: 0 },
         cards: [],
@@ -470,7 +486,7 @@ export default function SplendorGame() {
       },
       {
         id: 1,
-        name: mode === "pve" ? "Bot" : "Pemain 2",
+        name: mode === "pve" ? "Bot" : p2,
         isBot: mode === "pve",
         gems: { white: 0, blue: 0, green: 0, red: 0, black: 0, gold: 0 },
         cards: [],
@@ -1063,102 +1079,196 @@ export default function SplendorGame() {
     return differentColors <= 3 && totalSelected <= 3
   }
 
-  // Moved the menu rendering logic to the top of the SplendorGame component
+  // RENDER MENU
   if (gameState.gameMode === "menu") {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-blue-50 flex items-center justify-center p-4">
         <div className="w-full max-w-lg">
-          {/* Main Menu Card */}
-          <Card className="shadow-xl border-0 bg-white">
-            <CardHeader className="text-center py-8 bg-slate-900 text-white rounded-t-lg">
-              <div className="flex justify-center mb-4">
-                <div className="relative">
-                  <div className="w-20 h-20 bg-amber-400 rounded-full flex items-center justify-center shadow-lg">
-                    <Gem className="w-10 h-10 text-slate-900" />
-                  </div>
-                  <div className="absolute -top-2 -right-2 w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
-                    <Crown className="w-4 h-4 text-white" />
-                  </div>
-                </div>
+          <Card className="shadow-2xl border-0 bg-white rounded-xl overflow-hidden transform hover:scale-[1.01] transition-all duration-300">
+            <div className="bg-pink-800 py-6 px-8">
+              <div className="flex items-center gap-3 mb-2">
+                <Gem className="w-10 h-10 text-white" />
+                <h2 className="text-3xl font-bold text-white">Splendor</h2>
               </div>
-              <CardTitle className="text-4xl font-bold mb-2">Splendor</CardTitle>
-              <p className="text-slate-300 text-lg">Permainan Pedagang Renaissance</p>
-            </CardHeader>
-            <CardContent className="p-8 space-y-6">
-              <div className="text-center mb-8">
-                <h3 className="text-xl font-semibold text-slate-700 mb-2">Pilih Mode Permainan</h3>
-                <p className="text-slate-500">nih aku buatin tempat kamu latian wkwkw</p>
-              </div>
-              <div className="space-y-4">
-                <Button
-                  className="w-full h-16 text-lg font-semibold bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]"
-                  onClick={() => initializeGame("pvp")}
+              <p className="text-blue-100 text-sm">
+                selamat datang di skolah splendor kerajaan
+              </p>
+            </div>
+
+            <CardContent className="p-8 space-y-8">
+              {!pendingMode ? (
+                <>
+                  <div className="text-center mb-6">
+                    <h3 className="text-xl font-semibold text-gray-800">Pilih Mode Permainan</h3>
+                    <p className="text-gray-500 text-sm mt-1">maen sama gw ataw sama gpt</p>
+                  </div>
+
+                  <div className="space-y-4">
+                    <Button
+                      onClick={() => setPendingMode("pvp")}
+                      className="w-full h-20 text-lg font-semibold bg-pink-600 hover:bg-pink-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]"
+                    >
+                      <div className="flex items-center justify-center gap-4">
+                        <div className="relative">
+                          <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center -ml-4">
+                            <User className="w-6 h-6 text-[#ff007f]" />
+                          </div>
+                          <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center absolute -top-2 -right-5">
+                            <User className="w-6 h-6 text-[#ff007f]" />
+                          </div>
+                        </div>
+                        <div className="flex flex-col items-start ml-2">
+                          <span className="text-xl">Mabarrrr</span>
+                          <span className="text-xs text-blue-200">mabar sama gw pliss</span>
+                        </div>
+                      </div>
+                    </Button>
+
+                    <Button
+                      onClick={() => setPendingMode("pve")}
+                      className="w-full h-20 text-lg font-semibold bg-pink-400 hover:bg-pink-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]"
+                    >
+                      <div className="flex items-center justify-center gap-4">
+                        <div className="relative">
+                          <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center">
+                            <User className="w-6 h-6 text-[#ff007f]" />
+                          </div>
+                          <div className="absolute -right-4 top-1">
+                            <div className="text-white font-bold text-xl">VS</div>
+                          </div>
+                          <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center absolute -top-2 right-[-32px]">
+                            <Bot className="w-6 h-6 text-[#ff007f]" />
+                          </div>
+                        </div>
+                        <div className="flex flex-col items-start ml-6">
+                          <span className="text-xl">lawan gpt</span>
+                          <span className="text-xs text-emerald-200">bisa ga lu lawan gpt?</span>
+                        </div>
+                      </div>
+                    </Button>
+                  </div>
+
+                  <div className="text-center text-xs text-gray-500 pt-4 border-t border-gray-100">
+                    <p className="text-center text-sm text-gray-500 mt-8 nothint">
+                      Made with <span className=" hint text-white">♥</span> by{" "}
+                      <span className="hint text-white">rizal</span>
+                    </p>
+                  </div>
+                </>
+              ) : pendingMode === "pve" ? (
+                <form
+                  className="space-y-6"
+                  onSubmit={e => {
+                    e.preventDefault()
+                    initializeGame("pve", nameInputs.p1)
+                  }}
                 >
-                  <div className="flex items-center justify-center gap-4">
-                    <div className="flex -space-x-2">
-                      <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center">
-                        <User className="w-5 h-5 text-blue-600" />
-                      </div>
-                      <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center">
-                        <User className="w-5 h-5 text-blue-600" />
-                      </div>
-                    </div>
-                    <span>Mabarrrr</span>
+                  <div className="text-center mb-4">
+                    <h3 className="text-xl font-semibold text-gray-800">lawan gpt</h3>
+                    <p className="text-gray-500 text-sm mt-1">masukin nama sini </p>
                   </div>
-                </Button>
-                <Button
-                  className="w-full h-16 text-lg font-semibold bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]"
-                  onClick={() => initializeGame("pve")}
+
+                  <div className="space-y-2">
+                    <label className="block text-sm font-medium text-gray-700">Nama Kamu</label>
+                    <div className="relative">
+                      <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                      <input
+                        className="w-full border rounded-lg pl-10 pr-3 py-3 text-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="Masukkan nama kamu"
+                        value={nameInputs.p1}
+                        onChange={e => setNameInputs(n => ({ ...n, p1: e.target.value }))}
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex gap-3 pt-4">
+                    <Button
+                      type="submit"
+                      className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white h-12"
+                    >
+                      <Trophy className="w-5 h-5 mr-2" /> Mulai Bermain
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setPendingMode(null)}
+                      className="flex-1 h-12 border-gray-300"
+                    >
+                      Kembali
+                    </Button>
+                  </div>
+                </form>
+              ) : (
+                <form
+                  className="space-y-6"
+                  onSubmit={e => {
+                    e.preventDefault()
+                    initializeGame("pvp", nameInputs.p1, nameInputs.p2)
+                  }}
                 >
-                  <div className="flex items-center justify-center gap-4">
-                    <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center">
-                        <User className="w-5 h-5 text-emerald-600" />
+                  <div className="text-center mb-4">
+                    <h3 className="text-xl font-semibold text-gray-800">mabarrr</h3>
+                    <p className="text-gray-500 text-sm mt-1">masukin nama kalian</p>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <label className="block text-sm font-medium text-gray-700">Nama first choice</label>
+                      <div className="relative">
+                        <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-blue-500" />
+                        <input
+                          className="w-full border rounded-lg pl-10 pr-3 py-3 text-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          placeholder="Nama first choice"
+                          value={nameInputs.p1}
+                          onChange={e => setNameInputs(n => ({ ...n, p1: e.target.value }))}
+                          required
+                        />
                       </div>
-                      <span className="text-white font-bold">VS</span>
-                      <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center">
-                        <Bot className="w-5 h-5 text-emerald-600" />
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="block text-sm font-medium text-gray-700">Nama second choice</label>
+                      <div className="relative">
+                        <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-purple-500" />
+                        <input
+                          className="w-full border rounded-lg pl-10 pr-3 py-3 text-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          placeholder="Nama second choice"
+                          value={nameInputs.p2}
+                          onChange={e => setNameInputs(n => ({ ...n, p2: e.target.value }))}
+                          required
+                        />
                       </div>
                     </div>
-                    <span>Lawan Bot</span>
                   </div>
-                </Button>
-              </div>
-              <div className="mt-8 pt-6 border-t border-slate-200">
-                <div className="grid grid-cols-3 gap-4 text-center">
-                  <div className="flex flex-col items-center">
-                    <div className="w-12 h-12 bg-slate-100 rounded-lg flex items-center justify-center mb-2">
-                      <Diamond className="w-6 h-6 text-slate-600" />
-                    </div>
-                    <span className="text-sm text-slate-600 font-medium">Kumpulkan Permata</span>
+
+                  <div className="flex gap-3 pt-4">
+                    <Button
+                      type="submit"
+                      className="flex-1 bg-blue-600 hover:bg-blue-700 text-white h-12"
+                    >
+                      <Trophy className="w-5 h-5 mr-2" /> Mulai Bermain
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setPendingMode(null)}
+                      className="flex-1 h-12 border-gray-300"
+                    >
+                      Kembali
+                    </Button>
                   </div>
-                  <div className="flex flex-col items-center">
-                    <div className="w-12 h-12 bg-slate-100 rounded-lg flex items-center justify-center mb-2">
-                      <Star className="w-6 h-6 text-slate-600" />
-                    </div>
-                    <span className="text-sm text-slate-600 font-medium">Beli Kartu</span>
-                  </div>
-                  <div className="flex flex-col items-center">
-                    <div className="w-12 h-12 bg-slate-100 rounded-lg flex items-center justify-center mb-2">
-                      <Crown className="w-6 h-6 text-slate-600" />
-                    </div>
-                    <span className="text-sm text-slate-600 font-medium">Tarik Bangsawan</span>
-                  </div>
-                </div>
-              </div>
+                </form>
+              )}
             </CardContent>
           </Card>
-          {/* Footer */}
-          <div className="text-center mt-6">
-            <p className="text-center text-sm text-gray-500 mt-8 nothint">
-              Made with <span className=" hint text-gray-100 animate-pulse ">♥</span> by{" "}
-              <span className="hint text-gray-100">rizal</span>
-            </p>
-          </div>
         </div>
       </div>
     )
   }
+
+  // …RENDER GAME…
+  // Pastikan di kartu pemain Anda gunakan gameState.players[0].name dan [1].name
   const currentPlayer = gameState.players[gameState.currentPlayer]
   const currentPlayerBonuses = calculatePlayerBonuses(currentPlayer)
   return (
@@ -1208,7 +1318,10 @@ export default function SplendorGame() {
           )}
           <Button
             variant="outline"
-            onClick={() => setGameState(initialGameState)}
+            onClick={() => {
+              setGameState(initialGameState)
+              setPendingMode(null)
+            }}
             className="bg-red-50 hover:bg-red-100 text-red-600 border-red-200 transition-colors duration-200"
           >
             Permainan Baru
