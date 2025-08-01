@@ -1119,7 +1119,7 @@ export default function SplendorGame() {
                         </div>
                         <div className="flex flex-col items-start ml-2">
                           <span className="text-xl">Mabarrrr</span>
-                          <span className="text-xs text-blue-200">mabar sama gw pliss</span>
+                          <span className="text-xs text-white">mabar sama gw pliss</span>
                         </div>
                       </div>
                     </Button>
@@ -1142,7 +1142,7 @@ export default function SplendorGame() {
                         </div>
                         <div className="flex flex-col items-start ml-6">
                           <span className="text-xl">lawan gpt</span>
-                          <span className="text-xs text-emerald-200">bisa ga lu lawan gpt?</span>
+                          <span className="text-xs text-white">bisa ga lu lawan gpt?</span>
                         </div>
                       </div>
                     </Button>
