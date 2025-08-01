@@ -1530,13 +1530,13 @@ export default function SplendorGame() {
           <div className="xl:col-span-3 sm:col-span-1">
             {" "}
             {/* Changed xl:col-span-2 to xl:col-span-3 */}
-            <Card className="shadow-lg bg-gradient-to-br from-white to-gray-50 w-full max-w-full sm:max-w-3xl mx-auto p-2 sm:p-4">
+            <Card className="shadow-lg bg-gradient-to-br from-white to-gray-50 w-full max-w-full sm:max-w-3xl mx-auto p-1 sm:p-4">
               <CardContent className="mt-4 mb-0">
                 {/* Development Cards */}
                 <div className="space-y-4">
                   {(["tier3", "tier2", "tier1"] as const).map((tier) => (
                     <div key={tier}>
-                      <div className="flex items-end gap-4 pb-2 justify-center">
+                      <div className="flex items-end gap-2  justify-center">
                         {/* Deck Counter */}
                         <DeckCounter
                           count={gameState.decks[tier].length}
