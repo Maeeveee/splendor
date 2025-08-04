@@ -19,6 +19,7 @@ import NoblesBoard from "@/components/NoblesBoard"
 import WinnerModal from "@/components/WinnerModal"
 import GameHeader from "@/components/GameHeader"
 import BotNotification from "@/components/BotNotification"
+import HistoryModal from "@/components/HistoryModal"
 
 const DEVELOPMENT_CARDS = {
   tier1: [
@@ -155,28 +156,24 @@ const NOBLES = [
 const GEM_COLORS = ["white", "blue", "green", "red", "black"] as const
 type GemColor = (typeof GEM_COLORS)[number]
 
-interface GameState {
-  currentPlayer: number
-  players: Player[]
-  gems: Record<GemColor | "gold", number>
-  availableCards: {
-    tier1: (DevelopmentCard | null)[]
-    tier2: (DevelopmentCard | null)[]
-    tier3: (DevelopmentCard | null)[]
+interface GameHistory {
+  id: string
+  timestamp: number
+  gameMode: "pvp" | "pve"
+  players: {
+    name: string
+    isBot: boolean
+    finalPoints: number
+    finalCards: number
+    finalNobles: number
+  }[]
+  winner: {
+    id: number
+    name: string
+    points: number
   }
-  decks: {
-    tier1: DevelopmentCard[]
-    tier2: DevelopmentCard[]
-    tier3: DevelopmentCard[]
-  }
-  availableNobles: Noble[]
-  gameMode: "menu" | "pvp" | "pve"
-  winner: number | null
-  botThinking: boolean
-  lastBotAction: string | null
-  selectedGems: Record<GemColor, number>
-  botThinkingStage: string
-  animatingCard: number | null
+  duration: number
+  totalTurns: number
 }
 
 interface Player {
@@ -203,6 +200,32 @@ interface Noble {
   points: number
 }
 
+interface GameState {
+  currentPlayer: number
+  players: Player[]
+  gems: Record<GemColor | "gold", number>
+  availableCards: {
+    tier1: (DevelopmentCard | null)[]
+    tier2: (DevelopmentCard | null)[]
+    tier3: (DevelopmentCard | null)[]
+  }
+  decks: {
+    tier1: DevelopmentCard[]
+    tier2: DevelopmentCard[]
+    tier3: DevelopmentCard[]
+  }
+  availableNobles: Noble[]
+  gameMode: "menu" | "pvp" | "pve"
+  winner: number | null
+  botThinking: boolean
+  lastBotAction: string | null
+  selectedGems: Record<GemColor, number>
+  botThinkingStage: string
+  animatingCard: number | null
+  gameStartTime: number
+  turnCount: number
+}
+
 const initialGameState: GameState = {
   currentPlayer: 0,
   players: [],
@@ -225,6 +248,8 @@ const initialGameState: GameState = {
   selectedGems: { white: 0, blue: 0, green: 0, red: 0, black: 0 },
   botThinkingStage: "",
   animatingCard: null,
+  gameStartTime: 0,
+  turnCount: 0,
 }
 
 export default function SplendorGame() {
@@ -232,6 +257,8 @@ export default function SplendorGame() {
   const [botNotif, setBotNotif] = useState<string | null>(null)
   const [pendingMode, setPendingMode] = useState<"pvp" | "pve" | null>(null)
   const [nameInputs, setNameInputs] = useState<{ p1: string; p2: string }>({ p1: "", p2: "" })
+  const [showHistory, setShowHistory] = useState(false)
+  const [gameHistory, setGameHistory] = useState<GameHistory[]>([])
 
   const gemCollectSound = useRef(typeof Audio !== "undefined" ? new Audio("/sounds/gem-collect.mp3") : null)
   const cardBuySound = useRef(typeof Audio !== "undefined" ? new Audio("/sounds/card-buy.mp3") : null)
@@ -250,6 +277,20 @@ export default function SplendorGame() {
     const stored = localStorage.getItem("splendorNames")
     if (stored) setNameInputs(JSON.parse(stored))
   }, [])
+
+  useEffect(() => {
+    setGameHistory(getGameHistory())
+  }, [])
+
+  useEffect(() => {
+    if (gameState.winner !== null) {
+      saveGameHistory(gameState)
+      
+      setTimeout(() => {
+        setGameHistory(getGameHistory())
+      }, 100)
+    }
+  }, [gameState.winner])
 
   const shuffleArray = <T,>(array: T[]): T[] => {
     const shuffled = [...array]
@@ -385,6 +426,8 @@ export default function SplendorGame() {
       selectedGems: { white: 0, blue: 0, green: 0, red: 0, black: 0 },
       botThinkingStage: "",
       animatingCard: null,
+      gameStartTime: Date.now(),
+      turnCount: 0,
     })
   }
 
@@ -439,6 +482,7 @@ export default function SplendorGame() {
     }
 
     newState.animatingCard = card.id
+    newState.turnCount = prev.turnCount + 1
 
     return newState
   }
@@ -473,6 +517,7 @@ export default function SplendorGame() {
     }
 
     newState.animatingCard = card.id
+    newState.turnCount = prev.turnCount + 1
 
     return newState
   }
@@ -506,6 +551,7 @@ export default function SplendorGame() {
     newState.gems = newGemsSupply
 
     newState.selectedGems = { white: 0, blue: 0, green: 0, red: 0, black: 0 }
+    newState.turnCount = prev.turnCount + 1
 
     return newState
   }
@@ -831,147 +877,177 @@ export default function SplendorGame() {
   const currentPlayer = gameState.players[gameState.currentPlayer] || gameState.players[0]
   const currentPlayerBonuses = currentPlayer ? calculatePlayerBonuses(currentPlayer) : { white: 0, blue: 0, green: 0, red: 0, black: 0 }
 
+
+const saveGameHistory = (gameState: GameState) => {
+  if (gameState.winner === null) return
+
+  const endTime = Date.now()
+  const duration = Math.floor((endTime - gameState.gameStartTime) / 1000)
+  
+  const historyId = `game_${gameState.gameStartTime}_${gameState.winner}`
+  
+  const existingHistory = getGameHistory()
+  const isDuplicate = existingHistory.some(game => game.id === historyId)
+  
+  if (isDuplicate) {
+    console.log('Game already saved, skipping duplicate')
+    return
+  }
+  
+  const history: GameHistory = {
+    id: historyId,
+    timestamp: endTime,
+    gameMode: gameState.gameMode as "pvp" | "pve",
+    players: gameState.players.map(player => ({
+      name: player.name,
+      isBot: player.isBot,
+      finalPoints: player.points,
+      finalCards: player.cards.length,
+      finalNobles: player.nobles.length,
+    })),
+    winner: {
+      id: gameState.winner,
+      name: gameState.players[gameState.winner].name,
+      points: gameState.players[gameState.winner].points,
+    },
+    duration,
+    totalTurns: gameState.turnCount,
+  }
+
+  const updatedHistory = [history, ...existingHistory]
+  
+  const limitedHistory = updatedHistory.slice(0, 50)
+  
+  localStorage.setItem('splendorGameHistory', JSON.stringify(limitedHistory))
+  console.log('Game saved to history:', historyId)
+}
+
+const getGameHistory = (): GameHistory[] => {
+  try {
+    const stored = localStorage.getItem('splendorGameHistory')
+    return stored ? JSON.parse(stored) : []
+  } catch (error) {
+    console.warn('Error loading game history:', error)
+    return []
+  }
+}
+
+const clearGameHistory = () => {
+  localStorage.removeItem('splendorGameHistory')
+}
+
   if (gameState.gameMode === "menu") {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-blue-50 flex items-center justify-center p-4">
-        <div className="w-full max-w-lg">
-          <Card className="shadow-2xl border-0 bg-white rounded-xl overflow-hidden transform hover:scale-[1.01] transition-all duration-300">
-            <div className="bg-pink-800 py-6 px-8">
-              <div className="flex items-center gap-3 mb-2">
-                <Gem className="w-10 h-10 text-white" />
-                <h2 className="text-3xl font-bold text-white">Splendor</h2>
+      <>
+        <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-blue-50 flex items-center justify-center p-4">
+          <div className="w-full max-w-lg">
+            <Card className="shadow-2xl border-0 bg-white rounded-xl overflow-hidden transform hover:scale-[1.01] transition-all duration-300">
+              <div className="bg-pink-800 py-6 px-8">
+                <div className="flex items-center gap-3 mb-2">
+                  <Gem className="w-10 h-10 text-white" />
+                  <h2 className="text-3xl font-bold text-white">Splendor</h2>
+                </div>
+                <p className="text-blue-100 text-sm">
+                  selamat datang di skolah splendor kerajaan
+                </p>
               </div>
-              <p className="text-blue-100 text-sm">
-                selamat datang di skolah splendor kerajaan
-              </p>
-            </div>
 
-            <CardContent className="p-8 space-y-8">
-              {!pendingMode ? (
-                <>
-                  <div className="text-center mb-6">
-                    <h3 className="text-xl font-semibold text-gray-800">Pilih Mode Permainan</h3>
-                    <p className="text-gray-500 text-sm mt-1">maen sama gw ataw sama gpt</p>
-                  </div>
-
-                  <div className="space-y-4">
-                    <Button
-                      onClick={() => setPendingMode("pvp")}
-                      className="w-full h-20 text-lg font-semibold bg-pink-600 hover:bg-pink-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]"
-                    >
-                      <div className="flex items-center justify-center gap-4">
-                        <div className="relative">
-                          <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center -ml-4">
-                            <User className="w-6 h-6 text-[#ff007f]" />
-                          </div>
-                          <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center absolute -top-2 -right-5">
-                            <User className="w-6 h-6 text-[#ff007f]" />
-                          </div>
-                        </div>
-                        <div className="flex flex-col items-start ml-2">
-                          <span className="text-xl">Mabarrrr</span>
-                          <span className="text-xs text-white">mabar sama gw pliss</span>
-                        </div>
-                      </div>
-                    </Button>
-
-                    <Button
-                      onClick={() => setPendingMode("pve")}
-                      className="w-full h-20 text-lg font-semibold bg-pink-400 hover:bg-pink-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]"
-                    >
-                      <div className="flex items-center justify-center gap-4">
-                        <div className="relative">
-                          <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center">
-                            <User className="w-6 h-6 text-[#ff007f]" />
-                          </div>
-                          <div className="absolute -right-4 top-1">
-                            <div className="text-white font-bold text-xl">VS</div>
-                          </div>
-                          <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center absolute -top-2 right-[-32px]">
-                            <Bot className="w-6 h-6 text-[#ff007f]" />
-                          </div>
-                        </div>
-                        <div className="flex flex-col items-start ml-6">
-                          <span className="text-xl">lawan gpt</span>
-                          <span className="text-xs text-white">bisa ga lu lawan gpt?</span>
-                        </div>
-                      </div>
-                    </Button>
-                  </div>
-
-                  <div className="text-center text-xs text-gray-500 pt-4 border-t border-gray-100">
-                    <p className="text-center text-sm text-gray-500 mt-8 nothint">
-                      Made with <span className=" hint text-white">♥</span> by{" "}
-                      <span className="hint text-white">rizal</span>
-                    </p>
-                  </div>
-                </>
-              ) : pendingMode === "pve" ? (
-                <form
-                  className="space-y-6"
-                  onSubmit={e => {
-                    e.preventDefault()
-                    initializeGame("pve", nameInputs.p1)
-                  }}
-                >
-                  <div className="text-center mb-4">
-                    <h3 className="text-xl font-semibold text-gray-800">lawan gpt</h3>
-                    <p className="text-gray-500 text-sm mt-1">masukin nama sini </p>
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="block text-sm font-medium text-gray-700">Nama Kamu</label>
-                    <div className="relative">
-                      <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                      <input
-                        className="w-full border rounded-lg pl-10 pr-3 py-3 text-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="Masukkan nama kamu"
-                        value={nameInputs.p1}
-                        onChange={e => setNameInputs(n => ({ ...n, p1: e.target.value }))
-                        }
-                        required
-                      />
+              <CardContent className="p-8 space-y-8">
+                {!pendingMode ? (
+                  <>
+                    <div className="text-center mb-6">
+                      <h3 className="text-xl font-semibold text-gray-800">Pilih Mode Permainan</h3>
+                      <p className="text-gray-500 text-sm mt-1">maen sama gw ataw sama gpt</p>
                     </div>
-                  </div>
 
-                  <div className="flex gap-3 pt-4">
-                    <Button
-                      type="submit"
-                      className="flex-1 bg-pink-400 hover:bg-pink-700 text-white h-12"
-                    >
-                      <Trophy className="w-5 h-5 mr-2" /> Mulai Bermain
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => setPendingMode(null)}
-                      className="flex-1 h-12 border-gray-300"
-                    >
-                      Kembali
-                    </Button>
-                  </div>
-                </form>
-              ) : (
-                <form
-                  className="space-y-6"
-                  onSubmit={e => {
-                    e.preventDefault()
-                    initializeGame("pvp", nameInputs.p1, nameInputs.p2)
-                  }}
-                >
-                  <div className="text-center mb-4">
-                    <h3 className="text-xl font-semibold text-gray-800">mabarrr</h3>
-                    <p className="text-gray-500 text-sm mt-1">masukin nama kalian</p>
-                  </div>
+                    <div className="space-y-4">
+                      <Button
+                        onClick={() => setPendingMode("pvp")}
+                        className="w-full h-20 text-lg font-semibold bg-pink-600 hover:bg-pink-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]"
+                      >
+                        <div className="flex items-center justify-center gap-4">
+                          <div className="relative">
+                            <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center -ml-4">
+                              <User className="w-6 h-6 text-[#ff007f]" />
+                            </div>
+                            <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center absolute -top-2 -right-5">
+                              <User className="w-6 h-6 text-[#ff007f]" />
+                            </div>
+                          </div>
+                          <div className="flex flex-col items-start ml-2">
+                            <span className="text-xl">Mabarrrr</span>
+                            <span className="text-xs text-white">mabar sama gw pliss</span>
+                          </div>
+                        </div>
+                      </Button>
 
-                  <div className="space-y-4">
+                      <Button
+                        onClick={() => setPendingMode("pve")}
+                        className="w-full h-20 text-lg font-semibold bg-pink-400 hover:bg-pink-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]"
+                      >
+                        <div className="flex items-center justify-center gap-4">
+                          <div className="relative">
+                            <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center">
+                              <User className="w-6 h-6 text-[#ff007f]" />
+                            </div>
+                            <div className="absolute -right-4 top-1">
+                              <div className="text-white font-bold text-xl">VS</div>
+                            </div>
+                            <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center absolute -top-2 right-[-32px]">
+                              <Bot className="w-6 h-6 text-[#ff007f]" />
+                            </div>
+                          </div>
+                          <div className="flex flex-col items-start ml-6">
+                            <span className="text-xl">lawan gpt</span>
+                            <span className="text-xs text-white">bisa ga lu lawan gpt?</span>
+                          </div>
+                        </div>
+                      </Button>
+
+                      <Button
+                        onClick={() => setShowHistory(true)}
+                        variant="outline"
+                        className="w-full h-16 text-lg font-semibold border-2 border-purple-200 hover:border-purple-400 hover:bg-purple-50 transition-all duration-300"
+                      >
+                        <div className="flex items-center justify-center gap-3">
+                          <Trophy className="w-8 h-8 text-purple-600" />
+                          <div className="flex flex-col items-start">
+                            <span className="text-purple-700">Riwayat & Statistik</span>
+                            <span className="text-xs text-purple-500">
+                              {gameHistory.length} permainan tersimpan
+                            </span>
+                          </div>
+                        </div>
+                      </Button>
+                    </div>
+
+                    <div className="text-center text-xs text-gray-500 pt-4 border-t border-gray-100">
+                      <p className="text-center text-sm text-gray-500 mt-8 nothint">
+                        Made with <span className=" hint text-white">♥</span> by{" "}
+                        <span className="hint text-white">rizal</span>
+                      </p>
+                    </div>
+                  </>
+                ) : pendingMode === "pve" ? (
+                  <form
+                    className="space-y-6"
+                    onSubmit={e => {
+                      e.preventDefault()
+                      initializeGame("pve", nameInputs.p1)
+                    }}
+                  >
+                    <div className="text-center mb-4">
+                      <h3 className="text-xl font-semibold text-gray-800">lawan gpt</h3>
+                      <p className="text-gray-500 text-sm mt-1">masukin nama sini </p>
+                    </div>
+
                     <div className="space-y-2">
-                      <label className="block text-sm font-medium text-gray-700">Nama first choice</label>
+                      <label className="block text-sm font-medium text-gray-700">Nama Kamu</label>
                       <div className="relative">
-                        <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-blue-500" />
+                        <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                         <input
                           className="w-full border rounded-lg pl-10 pr-3 py-3 text-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                          placeholder="Nama first choice"
+                          placeholder="Masukkan nama kamu"
                           value={nameInputs.p1}
                           onChange={e => setNameInputs(n => ({ ...n, p1: e.target.value }))
                           }
@@ -980,44 +1056,97 @@ export default function SplendorGame() {
                       </div>
                     </div>
 
-                    <div className="space-y-2">
-                      <label className="block text-sm font-medium text-gray-700">Nama second choice</label>
-                      <div className="relative">
-                        <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-purple-500" />
-                        <input
-                          className="w-full border rounded-lg pl-10 pr-3 py-3 text-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                          placeholder="Nama second choice"
-                          value={nameInputs.p2}
-                          onChange={e => setNameInputs(n => ({ ...n, p2: e.target.value }))
-                          }
-                          required
-                        />
+                    <div className="flex gap-3 pt-4">
+                      <Button
+                        type="submit"
+                        className="flex-1 bg-pink-400 hover:bg-pink-700 text-white h-12"
+                      >
+                        <Trophy className="w-5 h-5 mr-2" /> Mulai Bermain
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => setPendingMode(null)}
+                        className="flex-1 h-12 border-gray-300"
+                      >
+                        Kembali
+                      </Button>
+                    </div>
+                  </form>
+                ) : (
+                  <form
+                    className="space-y-6"
+                    onSubmit={e => {
+                      e.preventDefault()
+                      initializeGame("pvp", nameInputs.p1, nameInputs.p2)
+                    }}
+                  >
+                    <div className="text-center mb-4">
+                      <h3 className="text-xl font-semibold text-gray-800">mabarrr</h3>
+                      <p className="text-gray-500 text-sm mt-1">masukin nama kalian</p>
+                    </div>
+
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <label className="block text-sm font-medium text-gray-700">Nama first choice</label>
+                        <div className="relative">
+                          <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-blue-500" />
+                          <input
+                            className="w-full border rounded-lg pl-10 pr-3 py-3 text-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="Nama first choice"
+                            value={nameInputs.p1}
+                            onChange={e => setNameInputs(n => ({ ...n, p1: e.target.value }))
+                            }
+                            required
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="block text-sm font-medium text-gray-700">Nama second choice</label>
+                        <div className="relative">
+                          <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-purple-500" />
+                          <input
+                            className="w-full border rounded-lg pl-10 pr-3 py-3 text-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="Nama second choice"
+                            value={nameInputs.p2}
+                            onChange={e => setNameInputs(n => ({ ...n, p2: e.target.value }))
+                            }
+                            required
+                          />
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  <div className="flex gap-3 pt-4">
-                    <Button
-                      type="submit"
-                      className="flex-1 bg-pink-600 hover:bg-pink-700 text-white h-12"
-                    >
-                      <Trophy className="w-5 h-5 mr-2" /> Mulai Bermain
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => setPendingMode(null)}
-                      className="flex-1 h-12 border-gray-300"
-                    >
-                      Kembali
-                    </Button>
-                  </div>
-                </form>
-              )}
-            </CardContent>
-          </Card>
+                    <div className="flex gap-3 pt-4">
+                      <Button
+                        type="submit"
+                        className="flex-1 bg-pink-600 hover:bg-pink-700 text-white h-12"
+                      >
+                        <Trophy className="w-5 h-5 mr-2" /> Mulai Bermain
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => setPendingMode(null)}
+                        className="flex-1 h-12 border-gray-300"
+                      >
+                        Kembali
+                      </Button>
+                    </div>
+                  </form>
+                )}
+              </CardContent>
+            </Card>
+          </div>
         </div>
-      </div>
+
+        <HistoryModal
+          isOpen={showHistory}
+          onClose={() => setShowHistory(false)}
+          history={gameHistory}
+        />
+      </>
     )
   }
 
@@ -1111,6 +1240,7 @@ export default function SplendorGame() {
           initialGameState={initialGameState}
         />
       )}
+
     </div>
   )
 }
