@@ -1,9 +1,48 @@
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Crown, Star } from "lucide-react"
-import GemToken from "./GemToken"
 
 const GEM_COLORS = ["white", "blue", "green", "red", "black"] as const
+
+const NobleGemToken = ({ color, count, size = "small" }: any) => {
+  const getSize = () => {
+    switch (size) {
+      case "tiny":
+        return "w-4 h-6 text-xs"
+      case "small":
+        return "w-6 h-8 text-xs"
+      default:
+        return "w-6 h-8 text-xs"
+    }
+  }
+
+  const getGemColor = (color: string) => {
+    const colors = {
+      white: "bg-gray-100 border-gray-400 text-gray-800",
+      blue: "bg-blue-500 border-blue-600 text-white",
+      green: "bg-green-500 border-green-600 text-white",
+      red: "bg-red-500 border-red-600 text-white",
+      black: "bg-gray-800 border-gray-900 text-white",
+      gold: "bg-yellow-400 border-yellow-500 text-black",
+    }
+
+    return colors[color as keyof typeof colors] || colors.white
+  }
+
+  return (
+    <div
+      className={`
+        ${getSize()} 
+        ${getGemColor(color)} 
+        rounded border-2 
+        flex items-center justify-center 
+        font-bold
+      `}
+    >
+      {count}
+    </div>
+  )
+}
 
 const NobleComponent = ({ noble, playerBonuses, layout = "horizontal" }: any) => {
   const canVisit = GEM_COLORS.every((color) => playerBonuses[color] >= noble.requirements[color])
@@ -39,7 +78,7 @@ const NobleComponent = ({ noble, playerBonuses, layout = "horizontal" }: any) =>
 
                 return (
                   <div key={color} className="flex flex-col items-center">
-                    <GemToken color={color} count={required} size="small" />
+                    <NobleGemToken color={color} count={required} size="small" />
                     <div
                       className={`text-xs mt-1 ${
                         playerHas >= required ? "text-green-600 font-bold" : "text-red-500"
@@ -93,7 +132,7 @@ const NobleComponent = ({ noble, playerBonuses, layout = "horizontal" }: any) =>
 
               return (
                 <div key={color} className="flex flex-col items-center">
-                  <GemToken color={color} count={required} size="tiny" />
+                  <NobleGemToken color={color} count={required} size="tiny" />
                   <div className={`text-xs mt-1 ${playerHas >= required ? "text-green-600" : "text-red-500"}`}>
                     {playerHas}/{required}
                   </div>

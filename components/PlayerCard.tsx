@@ -66,23 +66,23 @@ const PlayerCard = ({
           </div>
         </div>
 
-        <div>
-          <h4 className="font-medium mb-2 text-xs text-gray-600">Bonus</h4>
-          <div className="grid grid-cols-5 gap-2 place-items-center">
-            {GEM_COLORS.map((color) => {
-              const count = player.cards.filter((card: any) => card.provides === color).length
-              return (
-                <div key={color} className="flex flex-col items-center space-y-1">
-                  <div
-                    className={`w-6 h-6 rounded-full border-2 ${getGemColor(color)} flex items-center justify-center text-xs font-bold`}
-                  >
-                    {count}
-                  </div>
-                </div>
-              )
-            })}
+<div>
+  <h4 className="font-medium mb-2 text-xs text-gray-600">Bonus</h4>
+  <div className="grid grid-cols-5 gap-2 place-items-center">
+    {GEM_COLORS.map((color) => {
+      const count = player.cards.filter((card: any) => card.provides === color).length
+      return (
+        <div key={color} className="flex flex-col items-center space-y-1">
+          <div
+            className={`w-6 h-8 rounded border-2 ${getGemColor(color)} flex items-center justify-center text-xs font-bold`}
+          >
+            {count}
           </div>
         </div>
+      )
+    })}
+  </div>
+</div>
 
         {player.reservedCards.length > 0 && (
           <div>
