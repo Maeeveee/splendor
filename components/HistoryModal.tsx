@@ -49,8 +49,8 @@ const formatDate = (timestamp: number) => {
 const HistoryList = ({ history }: { history: GameHistory[] }) => {
   if (history.length === 0) {
     return (
-      <div className="text-center py-12 text-gray-500">
-        <Trophy className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+      <div className="text-center py-12 text-pink-500">
+        <Trophy className="w-12 h-12 mx-auto mb-4 text-pink-300" />
         <p>Belum ada riwayat permainan</p>
         <p className="text-sm">Mulai bermain untuk melihat riwayat!</p>
       </div>
@@ -60,12 +60,16 @@ const HistoryList = ({ history }: { history: GameHistory[] }) => {
   return (
     <div className="divide-y">
       {history.map((game) => (
-        <div key={game.id} className="p-4 hover:bg-gray-50 transition-colors">
+        <div key={game.id} className="p-4 hover:bg-pink-50 transition-colors">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-3">
               <Badge
                 variant={game.gameMode === 'pve' ? 'destructive' : 'default'}
-                className="text-xs"
+                className={`text-xs ${
+                  game.gameMode === 'pve' 
+                    ? 'bg-rose-100 text-rose-800 border-rose-300 hover:bg-rose-200' 
+                    : 'bg-pink-100 text-pink-800 border-pink-300 hover:bg-pink-200'
+                }`}
               >
                 {game.gameMode === 'pve' ? (
                   <>
@@ -79,11 +83,11 @@ const HistoryList = ({ history }: { history: GameHistory[] }) => {
                   </>
                 )}
               </Badge>
-              <span className="text-sm text-gray-500">
+              <span className="text-sm text-pink-600">
                 {formatDate(game.timestamp)}
               </span>
             </div>
-            <div className="flex items-center gap-2 text-sm text-gray-500">
+            <div className="flex items-center gap-2 text-sm text-pink-600">
               <Clock className="w-4 h-4" />
               {formatDuration(game.duration)}
             </div>
@@ -96,23 +100,23 @@ const HistoryList = ({ history }: { history: GameHistory[] }) => {
                 className={`flex items-center justify-between p-3 rounded-lg ${
                   game.winner.id === index
                     ? 'bg-yellow-50 border border-yellow-200'
-                    : 'bg-gray-50'
+                    : 'bg-pink-50 border border-pink-200'
                 }`}
               >
                 <div className="flex items-center gap-2">
                   {player.isBot ? (
-                    <Bot className="w-4 h-4 text-gray-600" />
+                    <Bot className="w-4 h-4 text-pink-600" />
                   ) : (
-                    <User className="w-4 h-4 text-blue-600" />
+                    <User className="w-4 h-4 text-pink-700" />
                   )}
-                  <span className="font-medium">{player.name}</span>
+                  <span className="font-medium text-pink-900">{player.name}</span>
                   {game.winner.id === index && (
                     <Trophy className="w-4 h-4 text-yellow-600" />
                   )}
                 </div>
                 <div className="text-right text-sm">
-                  <div className="font-bold text-lg">{player.finalPoints}</div>
-                  <div className="text-gray-500">
+                  <div className="font-bold text-lg text-pink-900">{player.finalPoints}</div>
+                  <div className="text-pink-600">
                     {player.finalCards}K • {player.finalNobles}N
                   </div>
                 </div>
@@ -120,7 +124,7 @@ const HistoryList = ({ history }: { history: GameHistory[] }) => {
             ))}
           </div>
 
-          <div className="mt-2 text-xs text-gray-500 text-center">
+          <div className="mt-2 text-xs text-pink-500 text-center">
             {game.totalTurns} giliran total
           </div>
         </div>
@@ -175,8 +179,8 @@ const StatisticsView = ({ history }: { history: GameHistory[] }) => {
 
   if (stats.totalGames === 0) {
     return (
-      <div className="text-center py-12 text-gray-500">
-        <BarChart3 className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+      <div className="text-center py-12 text-pink-500">
+        <BarChart3 className="w-16 h-16 mx-auto mb-4 text-pink-300" />
         <h3 className="text-lg font-medium mb-2">Belum ada data statistik</h3>
         <p className="text-sm">Selesaikan beberapa permainan untuk melihat statistik!</p>
       </div>
@@ -186,37 +190,37 @@ const StatisticsView = ({ history }: { history: GameHistory[] }) => {
   return (
     <>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        <div className="bg-blue-50 p-6 rounded-lg text-center border border-blue-100">
-          <div className="text-3xl font-bold text-blue-600 mb-1">{stats.totalGames}</div>
-          <div className="text-sm text-blue-800 font-medium">Total Permainan</div>
+        <div className="bg-pink-50 p-6 rounded-lg text-center border border-pink-200">
+          <div className="text-3xl font-bold text-pink-600 mb-1">{stats.totalGames}</div>
+          <div className="text-sm text-pink-800 font-medium">Total Permainan</div>
         </div>
         
-        <div className="bg-green-50 p-6 rounded-lg text-center border border-green-100">
-          <div className="text-3xl font-bold text-green-600 mb-1">{stats.winsAsHuman}</div>
-          <div className="text-sm text-green-800 font-medium">Kemenangan</div>
+        <div className="bg-rose-50 p-6 rounded-lg text-center border border-rose-200">
+          <div className="text-3xl font-bold text-rose-600 mb-1">{stats.winsAsHuman}</div>
+          <div className="text-sm text-rose-800 font-medium">Kemenangan</div>
         </div>
         
-        <div className="bg-red-50 p-6 rounded-lg text-center border border-red-100">
+        <div className="bg-red-50 p-6 rounded-lg text-center border border-red-200">
           <div className="text-3xl font-bold text-red-600 mb-1">{stats.winsVsBot}</div>
           <div className="text-sm text-red-800 font-medium">Kekalahan</div>
         </div>
         
-        <div className="bg-yellow-50 p-6 rounded-lg text-center border border-yellow-100">
+        <div className="bg-yellow-50 p-6 rounded-lg text-center border border-yellow-200">
           <div className="text-3xl font-bold text-yellow-600 mb-1">{stats.winRate}%</div>
           <div className="text-sm text-yellow-800 font-medium">Win Rate</div>
         </div>
 
-        <div className="bg-purple-50 p-6 rounded-lg text-center border border-purple-100">
+        <div className="bg-purple-50 p-6 rounded-lg text-center border border-purple-200">
           <div className="text-3xl font-bold text-purple-600 mb-1">{formatDuration(stats.averageDuration)}</div>
           <div className="text-sm text-purple-800 font-medium">Rata-rata Durasi</div>
         </div>
         
-        <div className="bg-indigo-50 p-6 rounded-lg text-center border border-indigo-100">
-          <div className="text-3xl font-bold text-indigo-600 mb-1">{stats.averagePoints}</div>
-          <div className="text-sm text-indigo-800 font-medium">Rata-rata Poin</div>
+        <div className="bg-fuchsia-50 p-6 rounded-lg text-center border border-fuchsia-200">
+          <div className="text-3xl font-bold text-fuchsia-600 mb-1">{stats.averagePoints}</div>
+          <div className="text-sm text-fuchsia-800 font-medium">Rata-rata Poin</div>
         </div>
 
-        <div className="bg-orange-50 p-6 rounded-lg text-center border border-orange-100">
+        <div className="bg-orange-50 p-6 rounded-lg text-center border border-orange-200">
           <div className="text-3xl font-bold text-orange-600 mb-1">{stats.bestScore}</div>
           <div className="text-sm text-orange-800 font-medium">Skor Terbaik</div>
         </div>
@@ -227,9 +231,9 @@ const StatisticsView = ({ history }: { history: GameHistory[] }) => {
         </div>
       </div>
 
-      <div className="p-4 bg-gray-50 rounded-lg">
-        <h4 className="font-semibold text-gray-700 mb-2">Ringkasan Performance</h4>
-        <div className="text-sm text-gray-600 space-y-1">
+      <div className="p-4 bg-pink-50 rounded-lg border border-pink-200">
+        <h4 className="font-semibold text-pink-800 mb-2">Ringkasan Performance</h4>
+        <div className="text-sm text-pink-700 space-y-1">
           <p>• Anda telah menyelesaikan <strong>{stats.totalGames}</strong> permainan</p>
           <p>• Win rate Anda adalah <strong>{stats.winRate}%</strong> {stats.winRate >= 50 ? '🎉' : '💪'}</p>
           <p>• Skor tertinggi yang pernah dicapai: <strong>{stats.bestScore} poin</strong></p>
@@ -253,8 +257,8 @@ const HistoryModal = ({ isOpen, onClose, history }: HistoryModalProps) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <Card className="w-full max-w-4xl max-h-[80vh] overflow-hidden">
-        <CardHeader className="flex flex-row items-center justify-between bg-gradient-to-r from-purple-600 to-blue-600 text-white">
+      <Card className="w-full max-w-4xl max-h-[80vh] overflow-hidden border-pink-200 shadow-2xl shadow-pink-100">
+        <CardHeader className="flex flex-row items-center justify-between bg-gradient-to-r from-pink-500 to-rose-500 text-white">
           <div className="flex items-center gap-2">
             <Trophy className="w-6 h-6" />
             <CardTitle className="text-xl">Riwayat Permainan</CardTitle>
@@ -263,20 +267,20 @@ const HistoryModal = ({ isOpen, onClose, history }: HistoryModalProps) => {
             variant="ghost"
             size="sm"
             onClick={onClose}
-            className="text-white hover:bg-white/20"
+            className="text-white hover:bg-white/20 hover:text-pink-100"
           >
             <X className="w-5 h-5" />
           </Button>
         </CardHeader>
 
-        <div className="border-b">
-          <div className="flex">
+        <div className="border-b border-pink-200">
+          <div className="flex bg-pink-50">
             <button
               onClick={() => setActiveTab('history')}
-              className={`px-6 py-3 font-medium ${
+              className={`px-6 py-3 font-medium transition-all duration-200 ${
                 activeTab === 'history'
-                  ? 'border-b-2 border-purple-600 text-purple-600'
-                  : 'text-gray-500 hover:text-gray-700'
+                  ? 'border-b-2 border-pink-500 text-pink-600 bg-white'
+                  : 'text-pink-500 hover:text-pink-700 hover:bg-pink-100'
               }`}
             >
               <Users className="w-4 h-4 inline mr-2" />
@@ -284,10 +288,10 @@ const HistoryModal = ({ isOpen, onClose, history }: HistoryModalProps) => {
             </button>
             <button
               onClick={() => setActiveTab('stats')}
-              className={`px-6 py-3 font-medium ${
+              className={`px-6 py-3 font-medium transition-all duration-200 ${
                 activeTab === 'stats'
-                  ? 'border-b-2 border-purple-600 text-purple-600'
-                  : 'text-gray-500 hover:text-gray-700'
+                  ? 'border-b-2 border-pink-500 text-pink-600 bg-white'
+                  : 'text-pink-500 hover:text-pink-700 hover:bg-pink-100'
               }`}
             >
               <BarChart3 className="w-4 h-4 inline mr-2" />
@@ -296,7 +300,7 @@ const HistoryModal = ({ isOpen, onClose, history }: HistoryModalProps) => {
           </div>
         </div>
 
-        <CardContent className="p-0">
+        <CardContent className="p-0 bg-gradient-to-br from-pink-25 to-rose-25">
           {activeTab === 'history' && (
             <div className="max-h-96 overflow-y-auto">
               <HistoryList history={history} />

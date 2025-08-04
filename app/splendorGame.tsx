@@ -285,7 +285,7 @@ export default function SplendorGame() {
   useEffect(() => {
     if (gameState.winner !== null) {
       saveGameHistory(gameState)
-      
+
       setTimeout(() => {
         setGameHistory(getGameHistory())
       }, 100)
@@ -296,7 +296,7 @@ export default function SplendorGame() {
     const shuffled = [...array]
     for (let i = shuffled.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1))
-      ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+        ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
     }
     return shuffled
   }
@@ -431,191 +431,191 @@ export default function SplendorGame() {
     })
   }
 
-const buyCardLogic = (
-  prev: GameState,
-  playerId: number,
-  card: DevelopmentCard,
-  tier: keyof GameState["availableCards"],
-  cardIndex: number,
-): GameState => {
-  if (playerId === 0) {
-    cardBuySound.current?.play()
+  const buyCardLogic = (
+    prev: GameState,
+    playerId: number,
+    card: DevelopmentCard,
+    tier: keyof GameState["availableCards"],
+    cardIndex: number,
+  ): GameState => {
+    if (playerId === 0) {
+      cardBuySound.current?.play()
+    }
+
+    const newState = { ...prev }
+    const players = [...newState.players]
+    const player = { ...players[playerId] }
+    players[playerId] = player
+    newState.players = players
+
+    const { newPlayerGems, newGemsSupply } = calculateCostAndNewGems(player, card, newState.gems)
+    player.gems = newPlayerGems
+    newState.gems = newGemsSupply
+
+    player.cards = [...player.cards, card]
+    player.points += card.points
+
+    const newAvailableCards = { ...newState.availableCards }
+    const newDecks = {
+      tier1: [...prev.decks.tier1],
+      tier2: [...prev.decks.tier2],
+      tier3: [...prev.decks.tier3],
+    }
+
+    if (newDecks[tier].length > 0) {
+      newAvailableCards[tier] = [...newAvailableCards[tier]]
+      newAvailableCards[tier][cardIndex] = newDecks[tier].shift()!
+    } else {
+      newAvailableCards[tier] = [...newAvailableCards[tier]]
+      newAvailableCards[tier][cardIndex] = null
+    }
+    newState.availableCards = newAvailableCards
+    newState.decks = newDecks
+
+    const { newPlayerNobles, updatedAvailableNobles, playerPointsGained } = checkNobleVisitsImmutable(
+      player,
+      newState.availableNobles,
+    )
+    player.nobles = newPlayerNobles
+    player.points += playerPointsGained
+    newState.availableNobles = updatedAvailableNobles
+
+    if (player.points >= 15) {
+      newState.winner = playerId
+      gameWinSound.current?.play()
+    }
+
+    newState.animatingCard = card.id
+    newState.turnCount = prev.turnCount + 1
+
+    return newState
   }
 
-  const newState = { ...prev }
-  const players = [...newState.players]
-  const player = { ...players[playerId] }
-  players[playerId] = player
-  newState.players = players
+  const buyReservedCardLogic = (prev: GameState, playerId: number, card: DevelopmentCard): GameState => {
+    if (playerId === 0) {
+      cardBuySound.current?.play()
+    }
 
-  const { newPlayerGems, newGemsSupply } = calculateCostAndNewGems(player, card, newState.gems)
-  player.gems = newPlayerGems
-  newState.gems = newGemsSupply
+    const newState = { ...prev }
+    const players = [...newState.players]
+    const player = { ...players[playerId] }
+    players[playerId] = player
+    newState.players = players
 
-  player.cards = [...player.cards, card]
-  player.points += card.points
+    const { newPlayerGems, newGemsSupply } = calculateCostAndNewGems(player, card, newState.gems)
+    player.gems = newPlayerGems
+    newState.gems = newGemsSupply
 
-  const newAvailableCards = { ...newState.availableCards }
-  const newDecks = {
-    tier1: [...prev.decks.tier1],
-    tier2: [...prev.decks.tier2],
-    tier3: [...prev.decks.tier3],
+    player.cards = [...player.cards, card]
+    player.points += card.points
+
+    player.reservedCards = player.reservedCards.filter((c) => c.id !== card.id)
+
+    const { newPlayerNobles, updatedAvailableNobles, playerPointsGained } = checkNobleVisitsImmutable(
+      player,
+      newState.availableNobles,
+    )
+    player.nobles = newPlayerNobles
+    player.points += playerPointsGained
+    newState.availableNobles = updatedAvailableNobles
+
+    if (player.points >= 15) {
+      newState.winner = playerId
+      gameWinSound.current?.play()
+    }
+
+    newState.animatingCard = card.id
+    newState.turnCount = prev.turnCount + 1
+
+    return newState
   }
 
-  if (newDecks[tier].length > 0) {
-    newAvailableCards[tier] = [...newAvailableCards[tier]]
-    newAvailableCards[tier][cardIndex] = newDecks[tier].shift()!
-  } else {
-    newAvailableCards[tier] = [...newAvailableCards[tier]]
-    newAvailableCards[tier][cardIndex] = null
-  }
-  newState.availableCards = newAvailableCards
-  newState.decks = newDecks
+  const reserveCardLogic = (
+    prev: GameState,
+    playerId: number,
+    card: DevelopmentCard,
+    tier: keyof GameState["availableCards"],
+    cardIndex: number,
+  ): GameState => {
+    if (playerId === 0) {
+      cardReserveSound.current?.play()
+    }
 
-  const { newPlayerNobles, updatedAvailableNobles, playerPointsGained } = checkNobleVisitsImmutable(
-    player,
-    newState.availableNobles,
-  )
-  player.nobles = newPlayerNobles
-  player.points += playerPointsGained
-  newState.availableNobles = updatedAvailableNobles
+    const newState = { ...prev }
+    const players = [...newState.players]
+    const player = { ...players[playerId] }
+    players[playerId] = player
+    newState.players = players
 
-  if (player.points >= 15) {
-    newState.winner = playerId
-    gameWinSound.current?.play()
-  }
+    player.reservedCards = [...player.reservedCards, card]
 
-  newState.animatingCard = card.id
-  newState.turnCount = prev.turnCount + 1
+    const newGemsSupply = { ...newState.gems }
+    const newPlayerGems = { ...player.gems }
 
-  return newState
-}
+    if (newGemsSupply.gold > 0 && getTotalGems(newPlayerGems) < 10) {
+      newPlayerGems.gold++
+      newGemsSupply.gold--
+    }
+    player.gems = newPlayerGems
+    newState.gems = newGemsSupply
 
-const buyReservedCardLogic = (prev: GameState, playerId: number, card: DevelopmentCard): GameState => {
-  if (playerId === 0) {
-    cardBuySound.current?.play()
-  }
+    const newAvailableCards = { ...newState.availableCards }
+    const newDecks = {
+      tier1: [...prev.decks.tier1],
+      tier2: [...prev.decks.tier2],
+      tier3: [...prev.decks.tier3],
+    }
 
-  const newState = { ...prev }
-  const players = [...newState.players]
-  const player = { ...players[playerId] }
-  players[playerId] = player
-  newState.players = players
+    if (newDecks[tier].length > 0) {
+      newAvailableCards[tier] = [...newAvailableCards[tier]]
+      newAvailableCards[tier][cardIndex] = newDecks[tier].shift()!
+    } else {
+      newAvailableCards[tier] = [...newAvailableCards[tier]]
+      newAvailableCards[tier][cardIndex] = null
+    }
+    newState.availableCards = newAvailableCards
+    newState.decks = newDecks
 
-  const { newPlayerGems, newGemsSupply } = calculateCostAndNewGems(player, card, newState.gems)
-  player.gems = newPlayerGems
-  newState.gems = newGemsSupply
-
-  player.cards = [...player.cards, card]
-  player.points += card.points
-
-  player.reservedCards = player.reservedCards.filter((c) => c.id !== card.id)
-
-  const { newPlayerNobles, updatedAvailableNobles, playerPointsGained } = checkNobleVisitsImmutable(
-    player,
-    newState.availableNobles,
-  )
-  player.nobles = newPlayerNobles
-  player.points += playerPointsGained
-  newState.availableNobles = updatedAvailableNobles
-
-  if (player.points >= 15) {
-    newState.winner = playerId
-    gameWinSound.current?.play()
+    return newState
   }
 
-  newState.animatingCard = card.id
-  newState.turnCount = prev.turnCount + 1
+  const takeGemsLogic = (prev: GameState, playerId: number, selectedGems: Record<GemColor, number>): GameState => {
+    if (playerId === 0) {
+      gemCollectSound.current?.play()
+    }
 
-  return newState
-}
+    const newState = { ...prev }
+    const players = [...newState.players]
+    const player = { ...players[playerId] }
+    players[playerId] = player
+    newState.players = players
 
-const reserveCardLogic = (
-  prev: GameState,
-  playerId: number,
-  card: DevelopmentCard,
-  tier: keyof GameState["availableCards"],
-  cardIndex: number,
-): GameState => {
-  if (playerId === 0) {
-    cardReserveSound.current?.play()
-  }
+    const newPlayerGems = { ...player.gems }
+    const newGemsSupply = { ...newState.gems }
 
-  const newState = { ...prev }
-  const players = [...newState.players]
-  const player = { ...players[playerId] }
-  players[playerId] = player
-  newState.players = players
+    let currentTotalPlayerGems = getTotalGems(newPlayerGems)
+    const maxGems = 10
 
-  player.reservedCards = [...player.reservedCards, card]
-
-  const newGemsSupply = { ...newState.gems }
-  const newPlayerGems = { ...player.gems }
-
-  if (newGemsSupply.gold > 0 && getTotalGems(newPlayerGems) < 10) {
-    newPlayerGems.gold++
-    newGemsSupply.gold--
-  }
-  player.gems = newPlayerGems
-  newState.gems = newGemsSupply
-
-  const newAvailableCards = { ...newState.availableCards }
-  const newDecks = {
-    tier1: [...prev.decks.tier1],
-    tier2: [...prev.decks.tier2],
-    tier3: [...prev.decks.tier3],
-  }
-
-  if (newDecks[tier].length > 0) {
-    newAvailableCards[tier] = [...newAvailableCards[tier]]
-    newAvailableCards[tier][cardIndex] = newDecks[tier].shift()!
-  } else {
-    newAvailableCards[tier] = [...newAvailableCards[tier]]
-    newAvailableCards[tier][cardIndex] = null
-  }
-  newState.availableCards = newAvailableCards
-  newState.decks = newDecks
-
-  return newState
-}
-
-const takeGemsLogic = (prev: GameState, playerId: number, selectedGems: Record<GemColor, number>): GameState => {
-  if (playerId === 0) {
-    gemCollectSound.current?.play()
-  }
-
-  const newState = { ...prev }
-  const players = [...newState.players]
-  const player = { ...players[playerId] }
-  players[playerId] = player
-  newState.players = players
-
-  const newPlayerGems = { ...player.gems }
-  const newGemsSupply = { ...newState.gems }
-
-  let currentTotalPlayerGems = getTotalGems(newPlayerGems)
-  const maxGems = 10
-
-  for (const color of GEM_COLORS) {
-    const amountToTake = selectedGems[color]
-    if (amountToTake > 0) {
-      const canAdd = Math.min(amountToTake, maxGems - currentTotalPlayerGems)
-      if (canAdd > 0) {
-        newPlayerGems[color] += canAdd
-        newGemsSupply[color] -= canAdd
-        currentTotalPlayerGems += canAdd
+    for (const color of GEM_COLORS) {
+      const amountToTake = selectedGems[color]
+      if (amountToTake > 0) {
+        const canAdd = Math.min(amountToTake, maxGems - currentTotalPlayerGems)
+        if (canAdd > 0) {
+          newPlayerGems[color] += canAdd
+          newGemsSupply[color] -= canAdd
+          currentTotalPlayerGems += canAdd
+        }
       }
     }
+
+    player.gems = newPlayerGems
+    newState.gems = newGemsSupply
+
+    newState.selectedGems = { white: 0, blue: 0, green: 0, red: 0, black: 0 }
+    newState.turnCount = prev.turnCount + 1
+
+    return newState
   }
-
-  player.gems = newPlayerGems
-  newState.gems = newGemsSupply
-
-  newState.selectedGems = { white: 0, blue: 0, green: 0, red: 0, black: 0 }
-  newState.turnCount = prev.turnCount + 1
-
-  return newState
-}
 
   const updateSelectedGems = (color: GemColor) => {
     setGameState((prev) => {
@@ -625,7 +625,7 @@ const takeGemsLogic = (prev: GameState, playerId: number, selectedGems: Record<G
       const currentTotalPlayerGems = getTotalGems(currentPlayerGems)
       const totalSelectedBeforeClick = Object.values(newSelected).reduce((sum, val) => sum + val, 0)
       const differentColorsBeforeClick = Object.values(newSelected).filter((val) => val > 0).length
-      
+
       let nextValue: number
       if (currentSelectedCount === 0) {
         nextValue = 1
@@ -651,7 +651,7 @@ const takeGemsLogic = (prev: GameState, playerId: number, selectedGems: Record<G
       const tempSelected = { ...newSelected, [color]: nextValue }
       const totalSelectedAfterClick = Object.values(tempSelected).reduce((sum, val) => sum + val, 0)
       const differentColorsAfterClick = Object.values(tempSelected).filter((val) => val > 0).length
-      
+
       if (nextValue > 0) {
         if (totalSelectedAfterClick > 3) return prev
         if (nextValue === 2 && prev.gems[color] < 4) return prev
@@ -672,12 +672,12 @@ const takeGemsLogic = (prev: GameState, playerId: number, selectedGems: Record<G
     const differentColors = Object.values(gameState.selectedGems).filter((val) => val > 0).length
     if (totalSelected === 0) return false
     if (totalSelected > 3) return false
-    
+
     const twoOfAKindGemTake = Object.entries(gameState.selectedGems).find(([_, count]) => count === 2)
     if (twoOfAKindGemTake) {
       return differentColors === 1 && gameState.gems[twoOfAKindGemTake[0] as GemColor] >= 4
     }
-    
+
     return differentColors <= 3 && totalSelected <= 3
   }
 
@@ -746,7 +746,7 @@ const takeGemsLogic = (prev: GameState, playerId: number, selectedGems: Record<G
           tier: keyof GameState["availableCards"]
           index: number
         }>
-        
+
         const affordableCards = allAvailableCards.filter(({ card }) => canAffordCard(botPlayer, card))
         affordableCards.forEach(({ card, tier, index }) =>
           possibleActions.push({ type: "buyAvailable", card, tier, index }),
@@ -894,128 +894,128 @@ const takeGemsLogic = (prev: GameState, playerId: number, selectedGems: Record<G
   const currentPlayerBonuses = currentPlayer ? calculatePlayerBonuses(currentPlayer) : { white: 0, blue: 0, green: 0, red: 0, black: 0 }
 
 
-const saveGameHistory = (gameState: GameState) => {
-  if (gameState.winner === null) return
+  const saveGameHistory = (gameState: GameState) => {
+    if (gameState.winner === null) return
 
-  const endTime = Date.now()
-  const duration = Math.floor((endTime - gameState.gameStartTime) / 1000)
-  
-  const historyId = `game_${gameState.gameStartTime}_${gameState.winner}`
-  
-  const existingHistory = getGameHistory()
-  const isDuplicate = existingHistory.some(game => game.id === historyId)
-  
-  if (isDuplicate) {
-    console.log('Game already saved, skipping duplicate')
-    return
+    const endTime = Date.now()
+    const duration = Math.floor((endTime - gameState.gameStartTime) / 1000)
+
+    const historyId = `game_${gameState.gameStartTime}_${gameState.winner}`
+
+    const existingHistory = getGameHistory()
+    const isDuplicate = existingHistory.some(game => game.id === historyId)
+
+    if (isDuplicate) {
+      console.log('Game already saved, skipping duplicate')
+      return
+    }
+
+    const history: GameHistory = {
+      id: historyId,
+      timestamp: endTime,
+      gameMode: gameState.gameMode as "pvp" | "pve",
+      players: gameState.players.map(player => ({
+        name: player.name,
+        isBot: player.isBot,
+        finalPoints: player.points,
+        finalCards: player.cards.length,
+        finalNobles: player.nobles.length,
+      })),
+      winner: {
+        id: gameState.winner,
+        name: gameState.players[gameState.winner].name,
+        points: gameState.players[gameState.winner].points,
+      },
+      duration,
+      totalTurns: gameState.turnCount,
+    }
+
+    const updatedHistory = [history, ...existingHistory]
+
+    const limitedHistory = updatedHistory.slice(0, 50)
+
+    localStorage.setItem('splendorGameHistory', JSON.stringify(limitedHistory))
+    console.log('Game saved to history:', historyId)
   }
-  
-  const history: GameHistory = {
-    id: historyId,
-    timestamp: endTime,
-    gameMode: gameState.gameMode as "pvp" | "pve",
-    players: gameState.players.map(player => ({
-      name: player.name,
-      isBot: player.isBot,
-      finalPoints: player.points,
-      finalCards: player.cards.length,
-      finalNobles: player.nobles.length,
-    })),
-    winner: {
-      id: gameState.winner,
-      name: gameState.players[gameState.winner].name,
-      points: gameState.players[gameState.winner].points,
-    },
-    duration,
-    totalTurns: gameState.turnCount,
+
+  const getGameHistory = (): GameHistory[] => {
+    try {
+      const stored = localStorage.getItem('splendorGameHistory')
+      return stored ? JSON.parse(stored) : []
+    } catch (error) {
+      console.warn('Error loading game history:', error)
+      return []
+    }
   }
 
-  const updatedHistory = [history, ...existingHistory]
-  
-  const limitedHistory = updatedHistory.slice(0, 50)
-  
-  localStorage.setItem('splendorGameHistory', JSON.stringify(limitedHistory))
-  console.log('Game saved to history:', historyId)
-}
-
-const getGameHistory = (): GameHistory[] => {
-  try {
-    const stored = localStorage.getItem('splendorGameHistory')
-    return stored ? JSON.parse(stored) : []
-  } catch (error) {
-    console.warn('Error loading game history:', error)
-    return []
+  const clearGameHistory = () => {
+    localStorage.removeItem('splendorGameHistory')
   }
-}
-
-const clearGameHistory = () => {
-  localStorage.removeItem('splendorGameHistory')
-}
 
   if (gameState.gameMode === "menu") {
     return (
       <>
-        <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-blue-50 flex items-center justify-center p-4">
+        <div className="min-h-screen bg-gradient-to-br from-pink-50 via-rose-50 to-pink-100 flex items-center justify-center p-4">
           <div className="w-full max-w-lg">
-            <Card className="shadow-2xl border-0 bg-white rounded-xl overflow-hidden transform hover:scale-[1.01] transition-all duration-300">
-              <div className="bg-pink-800 py-6 px-8">
+            <Card className="shadow-2xl border-pink-200 bg-white rounded-xl overflow-hidden transform hover:scale-[1.01] transition-all duration-300 shadow-pink-100">
+              <div className="bg-gradient-to-r from-pink-500 to-rose-500 py-6 px-8">
                 <div className="flex items-center gap-3 mb-2">
                   <Gem className="w-10 h-10 text-white" />
                   <h2 className="text-3xl font-bold text-white">Splendor</h2>
                 </div>
-                <p className="text-blue-100 text-sm">
+                <p className="text-pink-100 text-sm">
                   selamat datang di skolah splendor kerajaan
                 </p>
               </div>
 
-              <CardContent className="p-8 space-y-8">
+              <CardContent className="p-8 space-y-8 bg-gradient-to-br from-pink-25 to-rose-25">
                 {!pendingMode ? (
                   <>
                     <div className="text-center mb-6">
-                      <h3 className="text-xl font-semibold text-gray-800">Pilih Mode Permainan</h3>
-                      <p className="text-gray-500 text-sm mt-1">maen sama gw ataw sama gpt</p>
+                      <h3 className="text-xl font-semibold text-pink-800">Pilih Mode Permainan</h3>
+                      <p className="text-pink-600 text-sm mt-1">maen sama gw ataw sama gpt</p>
                     </div>
 
                     <div className="space-y-4">
                       <Button
                         onClick={() => setPendingMode("pvp")}
-                        className="w-full h-20 text-lg font-semibold bg-pink-600 hover:bg-pink-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]"
+                        className="w-full h-20 text-lg font-semibold bg-pink-600 hover:bg-pink-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] border-0"
                       >
                         <div className="flex items-center justify-center gap-4">
                           <div className="relative">
                             <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center -ml-4">
-                              <User className="w-6 h-6 text-[#ff007f]" />
+                              <User className="w-6 h-6 text-pink-600" />
                             </div>
                             <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center absolute -top-2 -right-5">
-                              <User className="w-6 h-6 text-[#ff007f]" />
+                              <User className="w-6 h-6 text-pink-600" />
                             </div>
                           </div>
                           <div className="flex flex-col items-start ml-2">
                             <span className="text-xl">Mabarrrr</span>
-                            <span className="text-xs text-white">mabar sama gw pliss</span>
+                            <span className="text-xs text-pink-100">mabar sama gw pliss</span>
                           </div>
                         </div>
                       </Button>
 
                       <Button
                         onClick={() => setPendingMode("pve")}
-                        className="w-full h-20 text-lg font-semibold bg-pink-400 hover:bg-pink-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]"
+                        className="w-full h-20 text-lg font-semibold bg-rose-500 hover:bg-rose-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] border-0"
                       >
                         <div className="flex items-center justify-center gap-4">
                           <div className="relative">
                             <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center">
-                              <User className="w-6 h-6 text-[#ff007f]" />
+                              <User className="w-6 h-6 text-rose-600" />
                             </div>
                             <div className="absolute -right-4 top-1">
                               <div className="text-white font-bold text-xl">VS</div>
                             </div>
                             <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center absolute -top-2 right-[-32px]">
-                              <Bot className="w-6 h-6 text-[#ff007f]" />
+                              <Bot className="w-6 h-6 text-rose-600" />
                             </div>
                           </div>
                           <div className="flex flex-col items-start ml-6">
                             <span className="text-xl">lawan gpt</span>
-                            <span className="text-xs text-white">bisa ga lu lawan gpt?</span>
+                            <span className="text-xs text-rose-100">bisa ga lu lawan gpt?</span>
                           </div>
                         </div>
                       </Button>
@@ -1023,13 +1023,13 @@ const clearGameHistory = () => {
                       <Button
                         onClick={() => setShowHistory(true)}
                         variant="outline"
-                        className="w-full h-16 text-lg font-semibold border-2 border-purple-200 hover:border-purple-400 hover:bg-purple-50 transition-all duration-300"
+                        className="w-full h-16 text-lg font-semibold border-2 border-pink-300 hover:border-pink-400 hover:bg-pink-50 transition-all duration-300 text-pink-700 hover:text-pink-800"
                       >
                         <div className="flex items-center justify-center gap-3">
-                          <Trophy className="w-8 h-8 text-purple-600" />
+                          <Trophy className="w-8 h-8 text-pink-600" />
                           <div className="flex flex-col items-start">
-                            <span className="text-purple-700">Riwayat & Statistik</span>
-                            <span className="text-xs text-purple-500">
+                            <span className="text-pink-700">Riwayat & Statistik</span>
+                            <span className="text-xs text-pink-500">
                               {gameHistory.length} permainan tersimpan
                             </span>
                           </div>
@@ -1037,11 +1037,11 @@ const clearGameHistory = () => {
                       </Button>
                     </div>
 
-                    <div className="text-center text-xs text-gray-500 pt-4 border-t border-gray-100">
-                      <p className="text-center text-sm text-gray-500 mt-8 nothint">
-                        Made with <span className=" hint text-white">♥</span> by{" "}
-                        <span className="hint text-white">rizal</span>
-                      </p>
+                    <div className="text-center text-xs pt-4 border-t border-pink-200">
+                      <div className="flex items-center justify-center gap-1 text-sm mt-8">
+                        <span className="nothint">Made with</span>
+                        <span className="hint">♥ by rizal</span>
+                      </div>
                     </div>
                   </>
                 ) : pendingMode === "pve" ? (
@@ -1053,16 +1053,16 @@ const clearGameHistory = () => {
                     }}
                   >
                     <div className="text-center mb-4">
-                      <h3 className="text-xl font-semibold text-gray-800">lawan gpt</h3>
-                      <p className="text-gray-500 text-sm mt-1">masukin nama sini </p>
+                      <h3 className="text-xl font-semibold text-pink-800">lawan gpt</h3>
+                      <p className="text-pink-600 text-sm mt-1">masukin nama sini </p>
                     </div>
 
                     <div className="space-y-2">
-                      <label className="block text-sm font-medium text-gray-700">Nama Kamu</label>
+                      <label className="block text-sm font-medium text-pink-700">Nama Kamu</label>
                       <div className="relative">
-                        <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                        <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-pink-400" />
                         <input
-                          className="w-full border rounded-lg pl-10 pr-3 py-3 text-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-full border border-pink-200 rounded-lg pl-10 pr-3 py-3 text-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
                           placeholder="Masukkan nama kamu"
                           value={nameInputs.p1}
                           onChange={e => setNameInputs(n => ({ ...n, p1: e.target.value }))
@@ -1075,7 +1075,7 @@ const clearGameHistory = () => {
                     <div className="flex gap-3 pt-4">
                       <Button
                         type="submit"
-                        className="flex-1 bg-pink-400 hover:bg-pink-700 text-white h-12"
+                        className="flex-1 bg-rose-500 hover:bg-rose-600 text-white h-12 border-0"
                       >
                         <Trophy className="w-5 h-5 mr-2" /> Mulai Bermain
                       </Button>
@@ -1083,7 +1083,7 @@ const clearGameHistory = () => {
                         type="button"
                         variant="outline"
                         onClick={() => setPendingMode(null)}
-                        className="flex-1 h-12 border-gray-300"
+                        className="flex-1 h-12 border-pink-300 text-pink-700 hover:bg-pink-50 hover:text-pink-800"
                       >
                         Kembali
                       </Button>
@@ -1098,17 +1098,17 @@ const clearGameHistory = () => {
                     }}
                   >
                     <div className="text-center mb-4">
-                      <h3 className="text-xl font-semibold text-gray-800">mabarrr</h3>
-                      <p className="text-gray-500 text-sm mt-1">masukin nama kalian</p>
+                      <h3 className="text-xl font-semibold text-pink-800">mabarrr</h3>
+                      <p className="text-pink-600 text-sm mt-1">masukin nama kalian</p>
                     </div>
 
                     <div className="space-y-4">
                       <div className="space-y-2">
-                        <label className="block text-sm font-medium text-gray-700">Nama first choice</label>
+                        <label className="block text-sm font-medium text-pink-700">Nama first choice</label>
                         <div className="relative">
-                          <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-blue-500" />
+                          <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-pink-500" />
                           <input
-                            className="w-full border rounded-lg pl-10 pr-3 py-3 text-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full border border-pink-200 rounded-lg pl-10 pr-3 py-3 text-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
                             placeholder="Nama first choice"
                             value={nameInputs.p1}
                             onChange={e => setNameInputs(n => ({ ...n, p1: e.target.value }))
@@ -1119,11 +1119,11 @@ const clearGameHistory = () => {
                       </div>
 
                       <div className="space-y-2">
-                        <label className="block text-sm font-medium text-gray-700">Nama second choice</label>
+                        <label className="block text-sm font-medium text-pink-700">Nama second choice</label>
                         <div className="relative">
                           <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-purple-500" />
                           <input
-                            className="w-full border rounded-lg pl-10 pr-3 py-3 text-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full border border-pink-200 rounded-lg pl-10 pr-3 py-3 text-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
                             placeholder="Nama second choice"
                             value={nameInputs.p2}
                             onChange={e => setNameInputs(n => ({ ...n, p2: e.target.value }))
@@ -1137,7 +1137,7 @@ const clearGameHistory = () => {
                     <div className="flex gap-3 pt-4">
                       <Button
                         type="submit"
-                        className="flex-1 bg-pink-600 hover:bg-pink-700 text-white h-12"
+                        className="flex-1 bg-pink-600 hover:bg-pink-700 text-white h-12 border-0"
                       >
                         <Trophy className="w-5 h-5 mr-2" /> Mulai Bermain
                       </Button>
@@ -1145,7 +1145,7 @@ const clearGameHistory = () => {
                         type="button"
                         variant="outline"
                         onClick={() => setPendingMode(null)}
-                        className="flex-1 h-12 border-gray-300"
+                        className="flex-1 h-12 border-pink-300 text-pink-700 hover:bg-pink-50 hover:text-pink-800"
                       >
                         Kembali
                       </Button>
@@ -1169,7 +1169,7 @@ const clearGameHistory = () => {
   return (
     <div className="splendor-game-container">
       <BotNotification botNotif={botNotif} />
-      
+
       <div className="splendor-max-width splendor-space-y-4">
         <GameHeader
           gameState={gameState}
@@ -1178,7 +1178,7 @@ const clearGameHistory = () => {
           setPendingMode={setPendingMode}
           initialGameState={initialGameState}
         />
-        
+
         <div className="splendor-main-grid">
           <div className="splendor-col-left">
             <PlayerCard
@@ -1199,7 +1199,7 @@ const clearGameHistory = () => {
               gameState={gameState}
               currentPlayer={currentPlayer}
             />
-            
+
             <div className="splendor-hidden-lg">
               <GemSupply
                 gameState={gameState}
@@ -1213,7 +1213,7 @@ const clearGameHistory = () => {
               />
             </div>
           </div>
-          
+
           <div className="splendor-col-center">
             <DevelopmentCardsBoard
               gameState={gameState}
@@ -1223,7 +1223,7 @@ const clearGameHistory = () => {
               reserveCardLogic={reserveCardLogic}
               canAffordCard={canAffordCard}
             />
-            
+
             <div className="splendor-hidden-mobile mt-4">
               <GemSupply
                 gameState={gameState}
@@ -1237,7 +1237,7 @@ const clearGameHistory = () => {
               />
             </div>
           </div>
-          
+
           <div className="splendor-col-right">
             <NoblesBoard
               gameState={gameState}
@@ -1246,7 +1246,7 @@ const clearGameHistory = () => {
           </div>
         </div>
       </div>
-      
+
       {gameState.winner !== null && (
         <WinnerModal
           gameState={gameState}

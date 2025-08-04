@@ -234,14 +234,24 @@
   }
 }
 
-.hint::selection {
-  background-color: white;
-  color: pink;
+.nothint {
+  color: rgb(244 114 182);
+  font-weight: bold;
+}
+
+.hint {
+  color: rgb(255, 233, 245);
+  font-weight: bold;
 }
 
 .nothint::selection {
-  background-color: pink;
-  color: white;
+  background-color: rgb(244 114 182) !important;
+  color: white !important;
+}
+
+.hint::selection {
+  background-color: white !important;
+  color: rgb(244 114 182) !important;
 }
 
 .player-card-container {
