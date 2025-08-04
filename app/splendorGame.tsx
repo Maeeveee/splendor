@@ -260,10 +260,10 @@ export default function SplendorGame() {
   const [showHistory, setShowHistory] = useState(false)
   const [gameHistory, setGameHistory] = useState<GameHistory[]>([])
 
-  const gemCollectSound = useRef(typeof Audio !== "undefined" ? new Audio("/sounds/gem-collect.mp3") : null)
-  const cardBuySound = useRef(typeof Audio !== "undefined" ? new Audio("/sounds/card-buy.mp3") : null)
+  const gemCollectSound = useRef(typeof Audio !== "undefined" ? new Audio("/sounds/gem-collect.wav") : null)
+  const cardBuySound = useRef(typeof Audio !== "undefined" ? new Audio("/sounds/card-buy.wav") : null)
   const cardReserveSound = useRef(typeof Audio !== "undefined" ? new Audio("/sounds/card-reserve.mp3") : null)
-  const gameWinSound = useRef(typeof Audio !== "undefined" ? new Audio("/sounds/game-win.mp3") : null)
+  const gameWinSound = useRef(typeof Audio !== "undefined" ? new Audio("/sounds/game-win.wav") : null)
 
   useEffect(() => {
     if (gameState.lastBotAction) {
@@ -431,175 +431,191 @@ export default function SplendorGame() {
     })
   }
 
-  const buyCardLogic = (
-    prev: GameState,
-    playerId: number,
-    card: DevelopmentCard,
-    tier: keyof GameState["availableCards"],
-    cardIndex: number,
-  ): GameState => {
-    const newState = { ...prev }
-    const players = [...newState.players]
-    const player = { ...players[playerId] }
-    players[playerId] = player
-    newState.players = players
-
-    const { newPlayerGems, newGemsSupply } = calculateCostAndNewGems(player, card, newState.gems)
-    player.gems = newPlayerGems
-    newState.gems = newGemsSupply
-
-    player.cards = [...player.cards, card]
-    player.points += card.points
-
-    const newAvailableCards = { ...newState.availableCards }
-    const newDecks = {
-      tier1: [...prev.decks.tier1],
-      tier2: [...prev.decks.tier2],
-      tier3: [...prev.decks.tier3],
-    }
-
-    if (newDecks[tier].length > 0) {
-      newAvailableCards[tier] = [...newAvailableCards[tier]]
-      newAvailableCards[tier][cardIndex] = newDecks[tier].shift()!
-    } else {
-      newAvailableCards[tier] = [...newAvailableCards[tier]]
-      newAvailableCards[tier][cardIndex] = null
-    }
-    newState.availableCards = newAvailableCards
-    newState.decks = newDecks
-
-    const { newPlayerNobles, updatedAvailableNobles, playerPointsGained } = checkNobleVisitsImmutable(
-      player,
-      newState.availableNobles,
-    )
-    player.nobles = newPlayerNobles
-    player.points += playerPointsGained
-    newState.availableNobles = updatedAvailableNobles
-
-    if (player.points >= 15) {
-      newState.winner = playerId
-      gameWinSound.current?.play()
-    }
-
-    newState.animatingCard = card.id
-    newState.turnCount = prev.turnCount + 1
-
-    return newState
+const buyCardLogic = (
+  prev: GameState,
+  playerId: number,
+  card: DevelopmentCard,
+  tier: keyof GameState["availableCards"],
+  cardIndex: number,
+): GameState => {
+  if (playerId === 0) {
+    cardBuySound.current?.play()
   }
 
-  const buyReservedCardLogic = (prev: GameState, playerId: number, card: DevelopmentCard): GameState => {
-    const newState = { ...prev }
-    const players = [...newState.players]
-    const player = { ...players[playerId] }
-    players[playerId] = player
-    newState.players = players
+  const newState = { ...prev }
+  const players = [...newState.players]
+  const player = { ...players[playerId] }
+  players[playerId] = player
+  newState.players = players
 
-    const { newPlayerGems, newGemsSupply } = calculateCostAndNewGems(player, card, newState.gems)
-    player.gems = newPlayerGems
-    newState.gems = newGemsSupply
+  const { newPlayerGems, newGemsSupply } = calculateCostAndNewGems(player, card, newState.gems)
+  player.gems = newPlayerGems
+  newState.gems = newGemsSupply
 
-    player.cards = [...player.cards, card]
-    player.points += card.points
+  player.cards = [...player.cards, card]
+  player.points += card.points
 
-    player.reservedCards = player.reservedCards.filter((c) => c.id !== card.id)
-
-    const { newPlayerNobles, updatedAvailableNobles, playerPointsGained } = checkNobleVisitsImmutable(
-      player,
-      newState.availableNobles,
-    )
-    player.nobles = newPlayerNobles
-    player.points += playerPointsGained
-    newState.availableNobles = updatedAvailableNobles
-
-    if (player.points >= 15) {
-      newState.winner = playerId
-      gameWinSound.current?.play()
-    }
-
-    newState.animatingCard = card.id
-    newState.turnCount = prev.turnCount + 1
-
-    return newState
+  const newAvailableCards = { ...newState.availableCards }
+  const newDecks = {
+    tier1: [...prev.decks.tier1],
+    tier2: [...prev.decks.tier2],
+    tier3: [...prev.decks.tier3],
   }
 
-  const takeGemsLogic = (prev: GameState, playerId: number, selectedGems: Record<GemColor, number>): GameState => {
-    const newState = { ...prev }
-    const players = [...newState.players]
-    const player = { ...players[playerId] }
-    players[playerId] = player
-    newState.players = players
+  if (newDecks[tier].length > 0) {
+    newAvailableCards[tier] = [...newAvailableCards[tier]]
+    newAvailableCards[tier][cardIndex] = newDecks[tier].shift()!
+  } else {
+    newAvailableCards[tier] = [...newAvailableCards[tier]]
+    newAvailableCards[tier][cardIndex] = null
+  }
+  newState.availableCards = newAvailableCards
+  newState.decks = newDecks
 
-    const newPlayerGems = { ...player.gems }
-    const newGemsSupply = { ...newState.gems }
+  const { newPlayerNobles, updatedAvailableNobles, playerPointsGained } = checkNobleVisitsImmutable(
+    player,
+    newState.availableNobles,
+  )
+  player.nobles = newPlayerNobles
+  player.points += playerPointsGained
+  newState.availableNobles = updatedAvailableNobles
 
-    let currentTotalPlayerGems = getTotalGems(newPlayerGems)
-    const maxGems = 10
+  if (player.points >= 15) {
+    newState.winner = playerId
+    gameWinSound.current?.play()
+  }
 
-    for (const color of GEM_COLORS) {
-      const amountToTake = selectedGems[color]
-      if (amountToTake > 0) {
-        const canAdd = Math.min(amountToTake, maxGems - currentTotalPlayerGems)
-        if (canAdd > 0) {
-          newPlayerGems[color] += canAdd
-          newGemsSupply[color] -= canAdd
-          currentTotalPlayerGems += canAdd
-        }
+  newState.animatingCard = card.id
+  newState.turnCount = prev.turnCount + 1
+
+  return newState
+}
+
+const buyReservedCardLogic = (prev: GameState, playerId: number, card: DevelopmentCard): GameState => {
+  if (playerId === 0) {
+    cardBuySound.current?.play()
+  }
+
+  const newState = { ...prev }
+  const players = [...newState.players]
+  const player = { ...players[playerId] }
+  players[playerId] = player
+  newState.players = players
+
+  const { newPlayerGems, newGemsSupply } = calculateCostAndNewGems(player, card, newState.gems)
+  player.gems = newPlayerGems
+  newState.gems = newGemsSupply
+
+  player.cards = [...player.cards, card]
+  player.points += card.points
+
+  player.reservedCards = player.reservedCards.filter((c) => c.id !== card.id)
+
+  const { newPlayerNobles, updatedAvailableNobles, playerPointsGained } = checkNobleVisitsImmutable(
+    player,
+    newState.availableNobles,
+  )
+  player.nobles = newPlayerNobles
+  player.points += playerPointsGained
+  newState.availableNobles = updatedAvailableNobles
+
+  if (player.points >= 15) {
+    newState.winner = playerId
+    gameWinSound.current?.play()
+  }
+
+  newState.animatingCard = card.id
+  newState.turnCount = prev.turnCount + 1
+
+  return newState
+}
+
+const reserveCardLogic = (
+  prev: GameState,
+  playerId: number,
+  card: DevelopmentCard,
+  tier: keyof GameState["availableCards"],
+  cardIndex: number,
+): GameState => {
+  if (playerId === 0) {
+    cardReserveSound.current?.play()
+  }
+
+  const newState = { ...prev }
+  const players = [...newState.players]
+  const player = { ...players[playerId] }
+  players[playerId] = player
+  newState.players = players
+
+  player.reservedCards = [...player.reservedCards, card]
+
+  const newGemsSupply = { ...newState.gems }
+  const newPlayerGems = { ...player.gems }
+
+  if (newGemsSupply.gold > 0 && getTotalGems(newPlayerGems) < 10) {
+    newPlayerGems.gold++
+    newGemsSupply.gold--
+  }
+  player.gems = newPlayerGems
+  newState.gems = newGemsSupply
+
+  const newAvailableCards = { ...newState.availableCards }
+  const newDecks = {
+    tier1: [...prev.decks.tier1],
+    tier2: [...prev.decks.tier2],
+    tier3: [...prev.decks.tier3],
+  }
+
+  if (newDecks[tier].length > 0) {
+    newAvailableCards[tier] = [...newAvailableCards[tier]]
+    newAvailableCards[tier][cardIndex] = newDecks[tier].shift()!
+  } else {
+    newAvailableCards[tier] = [...newAvailableCards[tier]]
+    newAvailableCards[tier][cardIndex] = null
+  }
+  newState.availableCards = newAvailableCards
+  newState.decks = newDecks
+
+  return newState
+}
+
+const takeGemsLogic = (prev: GameState, playerId: number, selectedGems: Record<GemColor, number>): GameState => {
+  if (playerId === 0) {
+    gemCollectSound.current?.play()
+  }
+
+  const newState = { ...prev }
+  const players = [...newState.players]
+  const player = { ...players[playerId] }
+  players[playerId] = player
+  newState.players = players
+
+  const newPlayerGems = { ...player.gems }
+  const newGemsSupply = { ...newState.gems }
+
+  let currentTotalPlayerGems = getTotalGems(newPlayerGems)
+  const maxGems = 10
+
+  for (const color of GEM_COLORS) {
+    const amountToTake = selectedGems[color]
+    if (amountToTake > 0) {
+      const canAdd = Math.min(amountToTake, maxGems - currentTotalPlayerGems)
+      if (canAdd > 0) {
+        newPlayerGems[color] += canAdd
+        newGemsSupply[color] -= canAdd
+        currentTotalPlayerGems += canAdd
       }
     }
-
-    player.gems = newPlayerGems
-    newState.gems = newGemsSupply
-
-    newState.selectedGems = { white: 0, blue: 0, green: 0, red: 0, black: 0 }
-    newState.turnCount = prev.turnCount + 1
-
-    return newState
   }
 
-  const reserveCardLogic = (
-    prev: GameState,
-    playerId: number,
-    card: DevelopmentCard,
-    tier: keyof GameState["availableCards"],
-    cardIndex: number,
-  ): GameState => {
-    const newState = { ...prev }
-    const players = [...newState.players]
-    const player = { ...players[playerId] }
-    players[playerId] = player
-    newState.players = players
+  player.gems = newPlayerGems
+  newState.gems = newGemsSupply
 
-    player.reservedCards = [...player.reservedCards, card]
+  newState.selectedGems = { white: 0, blue: 0, green: 0, red: 0, black: 0 }
+  newState.turnCount = prev.turnCount + 1
 
-    const newGemsSupply = { ...newState.gems }
-    const newPlayerGems = { ...player.gems }
-
-    if (newGemsSupply.gold > 0 && getTotalGems(newPlayerGems) < 10) {
-      newPlayerGems.gold++
-      newGemsSupply.gold--
-    }
-    player.gems = newPlayerGems
-    newState.gems = newGemsSupply
-
-    const newAvailableCards = { ...newState.availableCards }
-    const newDecks = {
-      tier1: [...prev.decks.tier1],
-      tier2: [...prev.decks.tier2],
-      tier3: [...prev.decks.tier3],
-    }
-
-    if (newDecks[tier].length > 0) {
-      newAvailableCards[tier] = [...newAvailableCards[tier]]
-      newAvailableCards[tier][cardIndex] = newDecks[tier].shift()!
-    } else {
-      newAvailableCards[tier] = [...newAvailableCards[tier]]
-      newAvailableCards[tier][cardIndex] = null
-    }
-    newState.availableCards = newAvailableCards
-    newState.decks = newDecks
-
-    return newState
-  }
+  return newState
+}
 
   const updateSelectedGems = (color: GemColor) => {
     setGameState((prev) => {
