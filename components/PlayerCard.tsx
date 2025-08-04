@@ -32,7 +32,7 @@ const PlayerCard = ({
 
   return (
     <Card
-      className={`${isCurrentPlayer ? "ring-2 ring-blue-600 bg-blue-50 animate-pulse" : "bg-white"} shadow-md transition-all duration-300`}
+      className={`${isCurrentPlayer ? "ring-2 ring-blue-600 bg-blue-50 shadow-lg shadow-blue-200" : "bg-white"} shadow-md transition-all duration-300`}
     >
       <CardHeader className="pb-2">
         <CardTitle className="flex items-center gap-2 text-base">
