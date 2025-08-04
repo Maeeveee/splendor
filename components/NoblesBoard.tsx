@@ -13,7 +13,7 @@ const NoblesBoard = ({ gameState, currentPlayerBonuses }: any) => {
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2 text-lg">
           <Crown className="w-5 h-5 text-yellow-600" />
-          Bangsawan
+          Para Raja
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">

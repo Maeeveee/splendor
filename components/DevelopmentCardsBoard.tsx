@@ -16,7 +16,7 @@ const DevelopmentCardsBoard = ({
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2 text-lg">
           <Diamond className="w-5 h-5 text-purple-600" />
-          Kartu Pengembangan
+          Kartu Sumber Daya
         </CardTitle>
       </CardHeader>
       <CardContent>

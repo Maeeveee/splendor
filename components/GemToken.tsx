@@ -56,7 +56,7 @@ const GemToken = ({
 
   return (
     <div
-      className={`${sizeClasses[size]} rounded-full border-2 ${getGemColor(color)} flex items-center justify-center font-bold shadow-md transition-all duration-300 hover:scale-110 ${flash ? "animate-pulse" : ""}`}
+      className={`${sizeClasses[size]} rounded-full border-2 ${getGemColor(color)} flex items-center justify-center font-bold shadow-md transition-all duration-300 hover:scale-110`}
     >
       {count !== undefined && count > 0 ? count : getGemIcon(color)}
     </div>
