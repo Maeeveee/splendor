@@ -1,18 +1,10 @@
 "use client"
 
-import { useState, useEffect, useRef, useCallback } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Crown, Gem, User, Bot, Trophy, Eye, Diamond, Coins, Star, Brain } from "lucide-react"
+import { Card, CardContent } from "@/components/ui/card"
+import { Gem, User, Bot, Trophy } from "lucide-react"
 
-import GemToken from "@/components/GemToken"
-import DevelopmentCardComponent from "@/components/DevelopmentCard"
-import NobleComponent from "@/components/NobleComponent"
-import EmptyCardSlot from "@/components/EmptyCardSlot"
-import CardSlot from "@/components/CardSlot"
-import DeckCounter from "@/components/DeckCounter"
-import PlayerCard from "@/components/PlayerCard"
 import DevelopmentCardsBoard from "@/components/DevelopmentCardsBoard"
 import GemSupply from "@/components/GemSupply"
 import NoblesBoard from "@/components/NoblesBoard"
@@ -20,211 +12,10 @@ import WinnerModal from "@/components/WinnerModal"
 import GameHeader from "@/components/GameHeader"
 import BotNotification from "@/components/BotNotification"
 import HistoryModal from "@/components/HistoryModal"
+import PlayerCard from "@/components/PlayerCard"
 
-const DEVELOPMENT_CARDS = {
-  tier1: [
-    { id: 1, cost: { white: 0, blue: 1, green: 1, red: 1, black: 1 }, provides: "white", points: 0 },
-    { id: 2, cost: { white: 0, blue: 1, green: 2, red: 1, black: 1 }, provides: "white", points: 0 },
-    { id: 3, cost: { white: 0, blue: 2, green: 2, red: 0, black: 1 }, provides: "white", points: 0 },
-    { id: 4, cost: { white: 0, blue: 0, green: 3, red: 1, black: 1 }, provides: "white", points: 0 },
-    { id: 5, cost: { white: 1, blue: 0, green: 1, red: 1, black: 1 }, provides: "blue", points: 0 },
-    { id: 6, cost: { white: 1, blue: 0, green: 1, red: 2, black: 1 }, provides: "blue", points: 0 },
-    { id: 7, cost: { white: 1, blue: 0, green: 2, red: 2, black: 0 }, provides: "blue", points: 0 },
-    { id: 8, cost: { white: 1, blue: 0, green: 0, red: 1, black: 3 }, provides: "blue", points: 0 },
-    { id: 9, cost: { white: 1, blue: 1, green: 0, red: 1, black: 1 }, provides: "green", points: 0 },
-    { id: 10, cost: { white: 1, blue: 1, green: 0, red: 1, black: 2 }, provides: "green", points: 0 },
-    { id: 11, cost: { white: 0, blue: 2, green: 0, red: 2, black: 1 }, provides: "green", points: 0 },
-    { id: 12, cost: { white: 3, blue: 1, green: 0, red: 0, black: 1 }, provides: "green", points: 0 },
-    { id: 13, cost: { white: 1, blue: 1, green: 1, red: 0, black: 1 }, provides: "red", points: 0 },
-    { id: 14, cost: { white: 2, blue: 1, green: 1, red: 0, black: 1 }, provides: "red", points: 0 },
-    { id: 15, cost: { white: 2, blue: 0, green: 1, red: 0, black: 2 }, provides: "red", points: 0 },
-    { id: 16, cost: { white: 1, blue: 3, green: 1, red: 0, black: 0 }, provides: "red", points: 0 },
-    { id: 17, cost: { white: 1, blue: 1, green: 1, red: 1, black: 0 }, provides: "black", points: 0 },
-    { id: 18, cost: { white: 1, blue: 2, green: 1, red: 1, black: 0 }, provides: "black", points: 0 },
-    { id: 19, cost: { white: 2, blue: 2, green: 0, red: 1, black: 0 }, provides: "black", points: 0 },
-    { id: 20, cost: { white: 0, blue: 0, green: 1, red: 3, black: 1 }, provides: "black", points: 0 },
-    { id: 21, cost: { white: 0, blue: 0, green: 0, red: 2, black: 1 }, provides: "white", points: 0 },
-    { id: 22, cost: { white: 0, blue: 0, green: 1, red: 1, black: 1 }, provides: "white", points: 0 },
-    { id: 23, cost: { white: 0, blue: 0, green: 2, red: 0, black: 2 }, provides: "white", points: 0 },
-    { id: 24, cost: { white: 1, blue: 0, green: 0, red: 0, black: 2 }, provides: "white", points: 1 },
-    { id: 25, cost: { white: 0, blue: 3, green: 0, red: 0, black: 0 }, provides: "white", points: 1 },
-    { id: 26, cost: { white: 1, blue: 0, green: 0, red: 1, black: 2 }, provides: "white", points: 0 },
-    { id: 27, cost: { white: 0, blue: 1, green: 0, red: 0, black: 2 }, provides: "white", points: 0 },
-    { id: 28, cost: { white: 2, blue: 0, green: 0, red: 2, black: 0 }, provides: "white", points: 0 },
-    { id: 29, cost: { white: 1, blue: 0, green: 0, red: 2, black: 0 }, provides: "blue", points: 0 },
-    { id: 30, cost: { white: 0, blue: 0, green: 0, red: 1, black: 1 }, provides: "blue", points: 0 },
-    { id: 31, cost: { white: 2, blue: 0, green: 0, red: 0, black: 2 }, provides: "blue", points: 0 },
-    { id: 32, cost: { white: 0, blue: 1, green: 0, red: 0, black: 2 }, provides: "blue", points: 1 },
-    { id: 33, cost: { white: 0, blue: 0, green: 3, red: 0, black: 0 }, provides: "blue", points: 1 },
-    { id: 34, cost: { white: 2, blue: 1, green: 0, red: 0, black: 1 }, provides: "blue", points: 0 },
-    { id: 35, cost: { white: 2, blue: 0, green: 1, red: 0, black: 0 }, provides: "blue", points: 0 },
-    { id: 36, cost: { white: 0, blue: 2, green: 0, red: 0, black: 2 }, provides: "blue", points: 0 },
-    { id: 37, cost: { white: 0, blue: 2, green: 0, red: 1, black: 0 }, provides: "green", points: 0 },
-    { id: 38, cost: { white: 1, blue: 0, green: 0, red: 0, black: 1 }, provides: "green", points: 0 },
-    { id: 39, cost: { white: 0, blue: 2, green: 0, red: 2, black: 0 }, provides: "green", points: 0 },
-    { id: 40, cost: { white: 0, blue: 0, green: 1, red: 2, black: 0 }, provides: "green", points: 1 },
-    { id: 41, cost: { white: 0, blue: 0, green: 0, red: 3, black: 0 }, provides: "green", points: 1 },
-    { id: 42, cost: { white: 1, blue: 1, green: 2, red: 0, black: 0 }, provides: "green", points: 0 },
-    { id: 43, cost: { white: 0, blue: 0, green: 2, red: 2, black: 0 }, provides: "green", points: 0 },
-    { id: 44, cost: { white: 2, blue: 2, green: 0, red: 0, black: 0 }, provides: "green", points: 0 },
-    { id: 45, cost: { white: 2, blue: 0, green: 1, red: 0, black: 0 }, provides: "red", points: 0 },
-    { id: 46, cost: { white: 0, blue: 1, green: 0, red: 0, black: 1 }, provides: "red", points: 0 },
-    { id: 47, cost: { white: 2, blue: 0, green: 0, red: 0, black: 2 }, provides: "red", points: 0 },
-    { id: 48, cost: { white: 2, blue: 0, green: 0, red: 1, black: 0 }, provides: "red", points: 1 },
-    { id: 49, cost: { white: 0, blue: 0, green: 0, red: 0, black: 3 }, provides: "red", points: 1 },
-    { id: 50, cost: { white: 0, blue: 1, green: 1, red: 2, black: 0 }, provides: "red", points: 0 },
-    { id: 51, cost: { white: 0, blue: 0, green: 2, red: 0, black: 2 }, provides: "red", points: 0 },
-    { id: 52, cost: { white: 0, blue: 2, green: 2, red: 0, black: 0 }, provides: "red", points: 0 },
-    { id: 53, cost: { white: 0, blue: 1, green: 2, red: 0, black: 0 }, provides: "black", points: 0 },
-    { id: 54, cost: { white: 1, blue: 0, green: 0, red: 1, black: 0 }, provides: "black", points: 0 },
-    { id: 55, cost: { white: 0, blue: 0, green: 2, red: 0, black: 2 }, provides: "black", points: 0 },
-    { id: 56, cost: { white: 0, blue: 2, green: 0, red: 0, black: 1 }, provides: "black", points: 1 },
-    { id: 57, cost: { white: 3, blue: 0, green: 0, red: 0, black: 0 }, provides: "black", points: 1 },
-    { id: 58, cost: { white: 0, blue: 0, green: 1, red: 1, black: 2 }, provides: "black", points: 0 },
-    { id: 59, cost: { white: 2, blue: 0, green: 2, red: 0, black: 0 }, provides: "black", points: 0 },
-    { id: 60, cost: { white: 2, blue: 2, green: 0, red: 0, black: 0 }, provides: "black", points: 0 },
-  ],
-  tier2: [
-    { id: 61, cost: { white: 3, blue: 2, green: 2, red: 0, black: 0 }, provides: "white", points: 1 },
-    { id: 62, cost: { white: 0, blue: 1, green: 4, red: 2, black: 0 }, provides: "white", points: 2 },
-    { id: 63, cost: { white: 1, blue: 4, green: 2, red: 0, black: 0 }, provides: "white", points: 2 },
-    { id: 64, cost: { white: 0, blue: 0, green: 5, red: 3, black: 0 }, provides: "white", points: 2 },
-    { id: 65, cost: { white: 5, blue: 3, green: 0, red: 0, black: 0 }, provides: "white", points: 2 },
-    { id: 66, cost: { white: 0, blue: 2, green: 2, red: 3, black: 0 }, provides: "blue", points: 1 },
-    { id: 67, cost: { white: 0, blue: 2, green: 1, red: 4, black: 0 }, provides: "blue", points: 2 },
-    { id: 68, cost: { white: 0, blue: 0, green: 1, red: 4, black: 2 }, provides: "blue", points: 2 },
-    { id: 69, cost: { white: 0, blue: 0, green: 3, red: 5, black: 0 }, provides: "blue", points: 2 },
-    { id: 70, cost: { white: 3, blue: 0, green: 0, red: 0, black: 5 }, provides: "blue", points: 2 },
-    { id: 71, cost: { white: 0, blue: 3, green: 0, red: 2, black: 2 }, provides: "green", points: 1 },
-    { id: 72, cost: { white: 4, blue: 2, green: 0, red: 0, black: 1 }, provides: "green", points: 2 },
-    { id: 73, cost: { white: 4, blue: 2, green: 0, red: 1, black: 0 }, provides: "green", points: 2 },
-    { id: 74, cost: { white: 5, blue: 3, green: 0, red: 0, black: 0 }, provides: "green", points: 2 },
-    { id: 75, cost: { white: 0, blue: 5, green: 0, red: 0, black: 3 }, provides: "green", points: 2 },
-    { id: 76, cost: { white: 2, blue: 0, green: 0, red: 2, black: 3 }, provides: "red", points: 1 },
-    { id: 77, cost: { white: 1, blue: 0, green: 0, red: 2, black: 4 }, provides: "red", points: 2 },
-    { id: 78, cost: { white: 2, blue: 0, green: 1, red: 0, black: 4 }, provides: "red", points: 2 },
-    { id: 79, cost: { white: 3, blue: 0, green: 0, red: 0, black: 5 }, provides: "red", points: 2 },
-    { id: 80, cost: { white: 0, blue: 0, green: 0, red: 5, black: 3 }, provides: "red", points: 2 },
-    { id: 81, cost: { white: 0, blue: 0, green: 3, red: 2, black: 2 }, provides: "black", points: 1 },
-    { id: 82, cost: { white: 0, blue: 1, green: 2, red: 0, black: 4 }, provides: "black", points: 2 },
-    { id: 83, cost: { white: 2, blue: 0, green: 0, red: 1, black: 4 }, provides: "black", points: 2 },
-    { id: 84, cost: { white: 5, blue: 0, green: 0, red: 0, black: 3 }, provides: "black", points: 2 },
-    { id: 85, cost: { white: 0, blue: 0, green: 0, red: 3, black: 5 }, provides: "black", points: 2 },
-    { id: 86, cost: { white: 0, blue: 5, green: 3, red: 0, black: 0 }, provides: "white", points: 2 },
-    { id: 87, cost: { white: 6, blue: 0, green: 0, red: 0, black: 0 }, provides: "white", points: 3 },
-    { id: 88, cost: { white: 0, blue: 0, green: 0, red: 6, black: 0 }, provides: "blue", points: 3 },
-    { id: 89, cost: { white: 0, blue: 0, green: 6, red: 0, black: 0 }, provides: "green", points: 3 },
-    { id: 90, cost: { white: 0, blue: 0, green: 0, red: 0, black: 6 }, provides: "red", points: 3 },
-  ],
-  tier3: [
-    { id: 91, cost: { white: 3, blue: 3, green: 5, red: 3, black: 0 }, provides: "white", points: 3 },
-    { id: 92, cost: { white: 7, blue: 0, green: 0, red: 0, black: 0 }, provides: "white", points: 4 },
-    { id: 93, cost: { white: 6, blue: 3, green: 0, red: 0, black: 3 }, provides: "white", points: 4 },
-    { id: 94, cost: { white: 7, blue: 3, green: 0, red: 0, black: 0 }, provides: "white", points: 5 },
-    { id: 95, cost: { white: 0, blue: 3, green: 3, red: 5, black: 3 }, provides: "blue", points: 3 },
-    { id: 96, cost: { white: 0, blue: 7, green: 0, red: 0, black: 0 }, provides: "blue", points: 4 },
-    { id: 97, cost: { white: 3, blue: 6, green: 0, red: 0, black: 3 }, provides: "blue", points: 4 },
-    { id: 98, cost: { white: 0, blue: 7, green: 3, red: 0, black: 0 }, provides: "blue", points: 5 },
-    { id: 99, cost: { white: 3, blue: 0, green: 3, red: 3, black: 5 }, provides: "green", points: 3 },
-    { id: 100, cost: { white: 0, blue: 0, green: 7, red: 0, black: 0 }, provides: "green", points: 4 },
-    { id: 101, cost: { white: 3, blue: 0, green: 6, red: 3, black: 0 }, provides: "green", points: 4 },
-    { id: 102, cost: { white: 0, blue: 0, green: 7, red: 3, black: 0 }, provides: "green", points: 5 },
-    { id: 103, cost: { white: 5, blue: 3, green: 0, red: 3, black: 3 }, provides: "red", points: 3 },
-    { id: 104, cost: { white: 0, blue: 0, green: 0, red: 7, black: 0 }, provides: "red", points: 4 },
-    { id: 105, cost: { white: 0, blue: 3, green: 0, red: 6, black: 3 }, provides: "red", points: 4 },
-    { id: 106, cost: { white: 0, blue: 0, green: 0, red: 7, black: 3 }, provides: "red", points: 5 },
-    { id: 107, cost: { white: 3, blue: 5, green: 3, red: 0, black: 3 }, provides: "black", points: 3 },
-    { id: 108, cost: { white: 0, blue: 0, green: 0, red: 0, black: 7 }, provides: "black", points: 4 },
-    { id: 109, cost: { white: 0, blue: 0, green: 3, red: 3, black: 6 }, provides: "black", points: 4 },
-    { id: 110, cost: { white: 3, blue: 0, green: 0, red: 0, black: 7 }, provides: "black", points: 5 },
-  ],
-}
-
-const NOBLES = [
-  { id: 1, requirements: { white: 3, blue: 3, green: 3, red: 0, black: 0 }, points: 3 },
-  { id: 2, requirements: { white: 0, blue: 3, green: 3, red: 3, black: 0 }, points: 3 },
-  { id: 3, requirements: { white: 0, blue: 0, green: 3, red: 3, black: 3 }, points: 3 },
-  { id: 4, requirements: { white: 3, blue: 0, green: 0, red: 3, black: 3 }, points: 3 },
-  { id: 5, requirements: { white: 3, blue: 3, green: 0, red: 0, black: 3 }, points: 3 },
-  { id: 6, requirements: { white: 0, blue: 4, green: 4, red: 0, black: 0 }, points: 3 },
-  { id: 7, requirements: { white: 0, blue: 0, green: 4, red: 4, black: 0 }, points: 3 },
-  { id: 8, requirements: { white: 0, blue: 0, green: 0, red: 4, black: 4 }, points: 3 },
-  { id: 9, requirements: { white: 4, blue: 0, green: 0, red: 0, black: 4 }, points: 3 },
-  { id: 10, requirements: { white: 4, blue: 4, green: 0, red: 0, black: 0 }, points: 3 },
-]
-
-const GEM_COLORS = ["white", "blue", "green", "red", "black"] as const
-type GemColor = (typeof GEM_COLORS)[number]
-
-interface GameHistory {
-  id: string
-  timestamp: number
-  gameMode: "pvp" | "pve"
-  players: {
-    name: string
-    isBot: boolean
-    finalPoints: number
-    finalCards: number
-    finalNobles: number
-  }[]
-  winner: {
-    id: number
-    name: string
-    points: number
-  }
-  duration: number
-  totalTurns: number
-}
-
-interface Player {
-  id: number
-  name: string
-  isBot: boolean
-  gems: Record<GemColor | "gold", number>
-  cards: DevelopmentCard[]
-  reservedCards: DevelopmentCard[]
-  nobles: Noble[]
-  points: number
-}
-
-interface DevelopmentCard {
-  id: number
-  cost: Record<GemColor, number>
-  provides: GemColor
-  points: number
-}
-
-interface Noble {
-  id: number
-  requirements: Record<GemColor, number>
-  points: number
-}
-
-interface GameState {
-  currentPlayer: number
-  players: Player[]
-  gems: Record<GemColor | "gold", number>
-  availableCards: {
-    tier1: (DevelopmentCard | null)[]
-    tier2: (DevelopmentCard | null)[]
-    tier3: (DevelopmentCard | null)[]
-  }
-  decks: {
-    tier1: DevelopmentCard[]
-    tier2: DevelopmentCard[]
-    tier3: DevelopmentCard[]
-  }
-  availableNobles: Noble[]
-  gameMode: "menu" | "pvp" | "pve"
-  winner: number | null
-  botThinking: boolean
-  lastBotAction: string | null
-  selectedGems: Record<GemColor, number>
-  botThinkingStage: string
-  animatingCard: number | null
-  gameStartTime: number
-  turnCount: number
-}
+import { useSplendorGame } from "@/hooks/useSplendorGame"
+import { GameState } from "@/lib/types"
 
 const initialGameState: GameState = {
   currentPlayer: 0,
@@ -253,704 +44,34 @@ const initialGameState: GameState = {
 }
 
 export default function SplendorGame() {
-  const [gameState, setGameState] = useState<GameState>(initialGameState)
-  const [botNotif, setBotNotif] = useState<string | null>(null)
+  const {
+    gameState,
+    setGameState,
+    botNotif,
+    gameHistory,
+    initializeGame,
+    buyCard,
+    reserveCard,
+    buyReservedCard,
+    takeGems,
+    updateSelectedGems,
+    canTakeSelectedGems,
+    canAffordCard,
+    getTotalGems,
+    isSoundEnabled,
+    toggleSound
+  } = useSplendorGame()
+
   const [pendingMode, setPendingMode] = useState<"pvp" | "pve" | null>(null)
   const [nameInputs, setNameInputs] = useState<{ p1: string; p2: string }>({ p1: "", p2: "" })
   const [showHistory, setShowHistory] = useState(false)
-  const [gameHistory, setGameHistory] = useState<GameHistory[]>([])
-
-  const gemCollectSound = useRef(typeof Audio !== "undefined" ? new Audio("/sounds/gem-collect.wav") : null)
-  const cardBuySound = useRef(typeof Audio !== "undefined" ? new Audio("/sounds/card-buy.wav") : null)
-  const cardReserveSound = useRef(typeof Audio !== "undefined" ? new Audio("/sounds/card-reserve.mp3") : null)
-  const gameWinSound = useRef(typeof Audio !== "undefined" ? new Audio("/sounds/game-win.wav") : null)
-
-  useEffect(() => {
-    if (gameState.lastBotAction) {
-      setBotNotif(gameState.lastBotAction)
-      const timer = setTimeout(() => setBotNotif(null), 2500)
-      return () => clearTimeout(timer)
-    }
-  }, [gameState.lastBotAction])
 
   useEffect(() => {
     const stored = localStorage.getItem("splendorNames")
     if (stored) setNameInputs(JSON.parse(stored))
   }, [])
 
-  useEffect(() => {
-    setGameHistory(getGameHistory())
-  }, [])
-
-  useEffect(() => {
-    if (gameState.winner !== null) {
-      saveGameHistory(gameState)
-
-      setTimeout(() => {
-        setGameHistory(getGameHistory())
-      }, 100)
-    }
-  }, [gameState.winner])
-
-  const shuffleArray = <T,>(array: T[]): T[] => {
-    const shuffled = [...array]
-    for (let i = shuffled.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1))
-        ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
-    }
-    return shuffled
-  }
-
-  const calculatePlayerBonuses = (player: Player): Record<GemColor, number> => {
-    const bonuses: Record<GemColor, number> = { white: 0, blue: 0, green: 0, red: 0, black: 0 }
-    player.cards.forEach((card) => {
-      bonuses[card.provides]++
-    })
-    return bonuses
-  }
-
-  const canAffordCard = (player: Player, card: DevelopmentCard): boolean => {
-    const bonuses = calculatePlayerBonuses(player)
-    let goldNeeded = 0
-
-    for (const color of GEM_COLORS) {
-      const needed = card.cost[color]
-      const available = player.gems[color] + bonuses[color]
-      if (available < needed) {
-        goldNeeded += needed - available
-      }
-    }
-
-    return goldNeeded <= player.gems.gold
-  }
-
-  const getTotalGems = (playerGems: Record<GemColor | "gold", number>) =>
-    GEM_COLORS.reduce((sum, color) => sum + playerGems[color], 0) + playerGems.gold
-
-  const calculateCostAndNewGems = (
-    player: Player,
-    card: DevelopmentCard,
-    currentGemsSupply: Record<GemColor | "gold", number>,
-  ) => {
-    const bonuses = calculatePlayerBonuses(player)
-    const newPlayerGems = { ...player.gems }
-    const newGemsSupply = { ...currentGemsSupply }
-
-    for (const color of GEM_COLORS) {
-      const needed = card.cost[color]
-      const bonus = bonuses[color]
-      const fromGems = Math.min(Math.max(0, needed - bonus), newPlayerGems[color])
-      const fromGold = Math.max(0, needed - bonus - fromGems)
-
-      newPlayerGems[color] -= fromGems
-      newGemsSupply[color] += fromGems
-
-      if (fromGold > 0) {
-        newPlayerGems.gold -= fromGold
-        newGemsSupply.gold += fromGold
-      }
-    }
-    return { newPlayerGems, newGemsSupply }
-  }
-
-  const checkNobleVisitsImmutable = (player: Player, currentAvailableNobles: Noble[]) => {
-    const bonuses = calculatePlayerBonuses(player)
-    const newPlayerNobles = [...player.nobles]
-    let updatedAvailableNobles = [...currentAvailableNobles]
-    let playerPointsGained = 0
-
-    currentAvailableNobles.forEach((noble) => {
-      const canVisit = GEM_COLORS.every((color) => bonuses[color] >= noble.requirements[color])
-      if (canVisit && !newPlayerNobles.some((n) => n.id === noble.id)) {
-        newPlayerNobles.push(noble)
-        playerPointsGained += noble.points
-        updatedAvailableNobles = updatedAvailableNobles.filter((n) => n.id !== noble.id)
-      }
-    })
-    return { newPlayerNobles, updatedAvailableNobles, playerPointsGained }
-  }
-
-  const initializeGame = (mode: "pvp" | "pve", name1?: string, name2?: string) => {
-    const p1 = name1?.trim() || (mode === "pve" ? nameInputs.p1 || "Kamu" : nameInputs.p1 || "Pemain 1")
-    const p2 = mode === "pve" ? "" : name2?.trim() || nameInputs.p2 || "Pemain 2"
-
-    localStorage.setItem("splendorNames", JSON.stringify({ p1, p2 }))
-
-    const shuffledTier1 = shuffleArray(DEVELOPMENT_CARDS.tier1)
-    const shuffledTier2 = shuffleArray(DEVELOPMENT_CARDS.tier2)
-    const shuffledTier3 = shuffleArray(DEVELOPMENT_CARDS.tier3)
-    const shuffledNobles = shuffleArray(NOBLES)
-
-    const players: Player[] = [
-      {
-        id: 0,
-        name: p1,
-        isBot: false,
-        gems: { white: 0, blue: 0, green: 0, red: 0, black: 0, gold: 0 },
-        cards: [],
-        reservedCards: [],
-        nobles: [],
-        points: 0,
-      },
-      {
-        id: 1,
-        name: mode === "pve" ? "Bot" : p2,
-        isBot: mode === "pve",
-        gems: { white: 0, blue: 0, green: 0, red: 0, black: 0, gold: 0 },
-        cards: [],
-        reservedCards: [],
-        nobles: [],
-        points: 0,
-      },
-    ]
-
-    setGameState({
-      currentPlayer: 0,
-      players,
-      gems: { white: 4, blue: 4, green: 4, red: 4, black: 4, gold: 5 },
-      availableCards: {
-        tier1: shuffledTier1.slice(0, 4),
-        tier2: shuffledTier2.slice(0, 4),
-        tier3: shuffledTier3.slice(0, 4),
-      },
-      decks: {
-        tier1: shuffledTier1.slice(4),
-        tier2: shuffledTier2.slice(4),
-        tier3: shuffledTier3.slice(4),
-      },
-      availableNobles: shuffledNobles.slice(0, 3),
-      gameMode: mode,
-      winner: null,
-      botThinking: false,
-      lastBotAction: null,
-      selectedGems: { white: 0, blue: 0, green: 0, red: 0, black: 0 },
-      botThinkingStage: "",
-      animatingCard: null,
-      gameStartTime: Date.now(),
-      turnCount: 0,
-    })
-  }
-
-  const buyCardLogic = (
-    prev: GameState,
-    playerId: number,
-    card: DevelopmentCard,
-    tier: keyof GameState["availableCards"],
-    cardIndex: number,
-  ): GameState => {
-    if (playerId === 0) {
-      cardBuySound.current?.play()
-    }
-
-    const newState = { ...prev }
-    const players = [...newState.players]
-    const player = { ...players[playerId] }
-    players[playerId] = player
-    newState.players = players
-
-    const { newPlayerGems, newGemsSupply } = calculateCostAndNewGems(player, card, newState.gems)
-    player.gems = newPlayerGems
-    newState.gems = newGemsSupply
-
-    player.cards = [...player.cards, card]
-    player.points += card.points
-
-    const newAvailableCards = { ...newState.availableCards }
-    const newDecks = {
-      tier1: [...prev.decks.tier1],
-      tier2: [...prev.decks.tier2],
-      tier3: [...prev.decks.tier3],
-    }
-
-    if (newDecks[tier].length > 0) {
-      newAvailableCards[tier] = [...newAvailableCards[tier]]
-      newAvailableCards[tier][cardIndex] = newDecks[tier].shift()!
-    } else {
-      newAvailableCards[tier] = [...newAvailableCards[tier]]
-      newAvailableCards[tier][cardIndex] = null
-    }
-    newState.availableCards = newAvailableCards
-    newState.decks = newDecks
-
-    const { newPlayerNobles, updatedAvailableNobles, playerPointsGained } = checkNobleVisitsImmutable(
-      player,
-      newState.availableNobles,
-    )
-    player.nobles = newPlayerNobles
-    player.points += playerPointsGained
-    newState.availableNobles = updatedAvailableNobles
-
-    if (player.points >= 15) {
-      newState.winner = playerId
-      gameWinSound.current?.play()
-    }
-
-    newState.animatingCard = card.id
-    newState.turnCount = prev.turnCount + 1
-
-    return newState
-  }
-
-  const buyReservedCardLogic = (prev: GameState, playerId: number, card: DevelopmentCard): GameState => {
-    if (playerId === 0) {
-      cardBuySound.current?.play()
-    }
-
-    const newState = { ...prev }
-    const players = [...newState.players]
-    const player = { ...players[playerId] }
-    players[playerId] = player
-    newState.players = players
-
-    const { newPlayerGems, newGemsSupply } = calculateCostAndNewGems(player, card, newState.gems)
-    player.gems = newPlayerGems
-    newState.gems = newGemsSupply
-
-    player.cards = [...player.cards, card]
-    player.points += card.points
-
-    player.reservedCards = player.reservedCards.filter((c) => c.id !== card.id)
-
-    const { newPlayerNobles, updatedAvailableNobles, playerPointsGained } = checkNobleVisitsImmutable(
-      player,
-      newState.availableNobles,
-    )
-    player.nobles = newPlayerNobles
-    player.points += playerPointsGained
-    newState.availableNobles = updatedAvailableNobles
-
-    if (player.points >= 15) {
-      newState.winner = playerId
-      gameWinSound.current?.play()
-    }
-
-    newState.animatingCard = card.id
-    newState.turnCount = prev.turnCount + 1
-
-    return newState
-  }
-
-  const reserveCardLogic = (
-    prev: GameState,
-    playerId: number,
-    card: DevelopmentCard,
-    tier: keyof GameState["availableCards"],
-    cardIndex: number,
-  ): GameState => {
-    if (playerId === 0) {
-      cardReserveSound.current?.play()
-    }
-
-    const newState = { ...prev }
-    const players = [...newState.players]
-    const player = { ...players[playerId] }
-    players[playerId] = player
-    newState.players = players
-
-    player.reservedCards = [...player.reservedCards, card]
-
-    const newGemsSupply = { ...newState.gems }
-    const newPlayerGems = { ...player.gems }
-
-    if (newGemsSupply.gold > 0 && getTotalGems(newPlayerGems) < 10) {
-      newPlayerGems.gold++
-      newGemsSupply.gold--
-    }
-    player.gems = newPlayerGems
-    newState.gems = newGemsSupply
-
-    const newAvailableCards = { ...newState.availableCards }
-    const newDecks = {
-      tier1: [...prev.decks.tier1],
-      tier2: [...prev.decks.tier2],
-      tier3: [...prev.decks.tier3],
-    }
-
-    if (newDecks[tier].length > 0) {
-      newAvailableCards[tier] = [...newAvailableCards[tier]]
-      newAvailableCards[tier][cardIndex] = newDecks[tier].shift()!
-    } else {
-      newAvailableCards[tier] = [...newAvailableCards[tier]]
-      newAvailableCards[tier][cardIndex] = null
-    }
-    newState.availableCards = newAvailableCards
-    newState.decks = newDecks
-
-    return newState
-  }
-
-  const takeGemsLogic = (prev: GameState, playerId: number, selectedGems: Record<GemColor, number>): GameState => {
-    if (playerId === 0) {
-      gemCollectSound.current?.play()
-    }
-
-    const newState = { ...prev }
-    const players = [...newState.players]
-    const player = { ...players[playerId] }
-    players[playerId] = player
-    newState.players = players
-
-    const newPlayerGems = { ...player.gems }
-    const newGemsSupply = { ...newState.gems }
-
-    let currentTotalPlayerGems = getTotalGems(newPlayerGems)
-    const maxGems = 10
-
-    for (const color of GEM_COLORS) {
-      const amountToTake = selectedGems[color]
-      if (amountToTake > 0) {
-        const canAdd = Math.min(amountToTake, maxGems - currentTotalPlayerGems)
-        if (canAdd > 0) {
-          newPlayerGems[color] += canAdd
-          newGemsSupply[color] -= canAdd
-          currentTotalPlayerGems += canAdd
-        }
-      }
-    }
-
-    player.gems = newPlayerGems
-    newState.gems = newGemsSupply
-
-    newState.selectedGems = { white: 0, blue: 0, green: 0, red: 0, black: 0 }
-    newState.turnCount = prev.turnCount + 1
-
-    return newState
-  }
-
-  const updateSelectedGems = (color: GemColor) => {
-    setGameState((prev) => {
-      const newSelected = { ...prev.selectedGems }
-      const currentSelectedCount = newSelected[color]
-      const currentPlayerGems = prev.players[prev.currentPlayer].gems
-      const currentTotalPlayerGems = getTotalGems(currentPlayerGems)
-      const totalSelectedBeforeClick = Object.values(newSelected).reduce((sum, val) => sum + val, 0)
-      const differentColorsBeforeClick = Object.values(newSelected).filter((val) => val > 0).length
-
-      let nextValue: number
-      if (currentSelectedCount === 0) {
-        nextValue = 1
-      } else if (currentSelectedCount === 1) {
-        if (differentColorsBeforeClick === 2 && totalSelectedBeforeClick === 2) {
-          nextValue = 0
-        } else if (differentColorsBeforeClick === 3 && totalSelectedBeforeClick === 3) {
-          nextValue = 0
-        } else {
-          nextValue = 2
-        }
-      } else {
-        nextValue = 0
-      }
-
-      const alreadyTwoOfSame = Object.entries(newSelected).some(
-        ([k, v]) => v === 2 && k !== color
-      )
-      if (alreadyTwoOfSame && currentSelectedCount === 0) {
-        return prev
-      }
-
-      const tempSelected = { ...newSelected, [color]: nextValue }
-      const totalSelectedAfterClick = Object.values(tempSelected).reduce((sum, val) => sum + val, 0)
-      const differentColorsAfterClick = Object.values(tempSelected).filter((val) => val > 0).length
-
-      if (nextValue > 0) {
-        if (totalSelectedAfterClick > 3) return prev
-        if (nextValue === 2 && prev.gems[color] < 4) return prev
-        if (nextValue > prev.gems[color]) return prev
-        if (nextValue === 2 && differentColorsAfterClick > 1) return prev
-        const netChangeForThisColor = nextValue - currentSelectedCount
-        if (currentTotalPlayerGems + netChangeForThisColor > 10) {
-          return prev
-        }
-      }
-      newSelected[color] = nextValue
-      return { ...prev, selectedGems: newSelected }
-    })
-  }
-
-  const canTakeSelectedGems = () => {
-    const totalSelected = Object.values(gameState.selectedGems).reduce((sum, val) => sum + val, 0)
-    const differentColors = Object.values(gameState.selectedGems).filter((val) => val > 0).length
-    if (totalSelected === 0) return false
-    if (totalSelected > 3) return false
-
-    const twoOfAKindGemTake = Object.entries(gameState.selectedGems).find(([_, count]) => count === 2)
-    if (twoOfAKindGemTake) {
-      return differentColors === 1 && gameState.gems[twoOfAKindGemTake[0] as GemColor] >= 4
-    }
-
-    return differentColors <= 3 && totalSelected <= 3
-  }
-
-  const makeBotMove = useCallback(() => {
-    if (gameState.gameMode !== "pve" || gameState.currentPlayer !== 1 || gameState.winner) return
-
-    const thinkingStages = [
-      "Menganalisis kartu yang tersedia...",
-      "Menghitung kebutuhan permata...",
-      "Mengevaluasi peluang bangsawan...",
-      "Mempertimbangkan pilihan strategi...",
-      "Membuat keputusan akhir...",
-    ]
-
-    let stageIndex = 0
-    setGameState((prev) => ({
-      ...prev,
-      botThinking: true,
-      botThinkingStage: thinkingStages[0],
-    }))
-
-    const thinkingInterval = setInterval(() => {
-      stageIndex++
-      if (stageIndex < thinkingStages.length) {
-        setGameState((prev) => ({
-          ...prev,
-          botThinkingStage: thinkingStages[stageIndex],
-        }))
-      } else {
-        clearInterval(thinkingInterval)
-      }
-    }, 800)
-
-    setTimeout(() => {
-      clearInterval(thinkingInterval)
-      setGameState((prev) => {
-        if (prev.gameMode !== "pve" || prev.currentPlayer !== 1 || prev.winner || !prev.players[1]) {
-          return {
-            ...prev,
-            botThinking: false,
-            botThinkingStage: "",
-            lastBotAction: "Bot membatalkan giliran (permainan direset/berakhir)",
-          }
-        }
-
-        let currentBotState = { ...prev }
-        let botAction = ""
-        const botPlayer = currentBotState.players[1]
-
-        const possibleActions: Array<
-          | { type: "buyReserved"; card: DevelopmentCard }
-          | { type: "buyAvailable"; card: DevelopmentCard; tier: keyof GameState["availableCards"]; index: number }
-          | { type: "reserve"; card: DevelopmentCard; tier: keyof GameState["availableCards"]; index: number }
-          | { type: "takeGems"; selectedGems: Record<GemColor, number> }
-        > = []
-
-        const affordableReservedCards = botPlayer.reservedCards.filter((card) => canAffordCard(botPlayer, card))
-        affordableReservedCards.forEach((card) => possibleActions.push({ type: "buyReserved", card }))
-
-        const allAvailableCards = [
-          ...currentBotState.availableCards.tier1.map((card, index) => ({ card, tier: "tier1" as const, index })),
-          ...currentBotState.availableCards.tier2.map((card, index) => ({ card, tier: "tier2" as const, index })),
-          ...currentBotState.availableCards.tier3.map((card, index) => ({ card, tier: "tier3" as const, index })),
-        ].filter(({ card }) => card !== null) as Array<{
-          card: DevelopmentCard
-          tier: keyof GameState["availableCards"]
-          index: number
-        }>
-
-        const affordableCards = allAvailableCards.filter(({ card }) => canAffordCard(botPlayer, card))
-        affordableCards.forEach(({ card, tier, index }) =>
-          possibleActions.push({ type: "buyAvailable", card, tier, index }),
-        )
-
-        if (botPlayer.reservedCards.length < 3) {
-          const reservableCards = allAvailableCards.filter(
-            ({ card }) => !botPlayer.reservedCards.some((rc) => rc.id === card.id),
-          )
-          reservableCards.sort((a, b) => b.card.points - a.card.points)
-          reservableCards.slice(0, Math.min(reservableCards.length, 5)).forEach(({ card, tier, index }) => {
-            if (getTotalGems(botPlayer.gems) < 10 || currentBotState.gems.gold === 0) {
-              possibleActions.push({ type: "reserve", card, tier, index })
-            }
-          })
-        }
-
-        const strategicGemTake = (() => {
-          const bonuses = calculatePlayerBonuses(botPlayer)
-          const gemPriority = GEM_COLORS.map((color) => ({
-            color,
-            need: Math.max(0, 3 - bonuses[color]),
-          })).sort((a, b) => b.need - a.need)
-          const selected = { white: 0, blue: 0, green: 0, red: 0, black: 0 } as Record<GemColor, number>
-          let count = 0
-          for (const { color } of gemPriority) {
-            if (count < 3 && currentBotState.gems[color] > 0) {
-              selected[color] = 1
-              count++
-            }
-          }
-          if (getTotalGems(botPlayer.gems) + count <= 10) {
-            return count > 0 ? selected : null
-          }
-          return null
-        })()
-
-        const twoOfAKindGemTake = (() => {
-          const colorsWithFourPlus = GEM_COLORS.filter((color) => currentBotState.gems[color] >= 4)
-          if (colorsWithFourPlus.length > 0) {
-            const selected = { white: 0, blue: 0, green: 0, red: 0, black: 0 } as Record<GemColor, number>
-            const chosenColor = colorsWithFourPlus[Math.floor(Math.random() * colorsWithFourPlus.length)]
-            selected[chosenColor] = 2
-            if (getTotalGems(botPlayer.gems) + 2 <= 10) {
-              return selected
-            }
-          }
-          return null
-        })()
-
-        if (strategicGemTake) possibleActions.push({ type: "takeGems", selectedGems: strategicGemTake })
-        if (twoOfAKindGemTake) possibleActions.push({ type: "takeGems", selectedGems: twoOfAKindGemTake })
-
-        let chosenAction: (typeof possibleActions)[number] | null = null
-        const buyActions = possibleActions.filter(
-          (a) => a.type === "buyReserved" || a.type === "buyAvailable",
-        ) as Array<
-          | { type: "buyReserved"; card: DevelopmentCard }
-          | { type: "buyAvailable"; card: DevelopmentCard; tier: keyof GameState["availableCards"]; index: number }
-        >
-        const nonBuyActions = possibleActions.filter((a) => a.type === "reserve" || a.type === "takeGems") as Array<
-          | { type: "reserve"; card: DevelopmentCard; tier: keyof GameState["availableCards"]; index: number }
-          | { type: "takeGems"; selectedGems: Record<GemColor, number> }
-        >
-
-        const randomDecisionChance = 0.35
-        if (buyActions.length > 0 && Math.random() > randomDecisionChance) {
-          buyActions.sort((a, b) => b.card.points - a.card.points)
-          const topPoint = buyActions[0].card.points
-          const bestBuyOptions = buyActions.filter((a) => a.card.points === topPoint)
-          chosenAction = bestBuyOptions[Math.floor(Math.random() * bestBuyOptions.length)]
-        } else if (nonBuyActions.length > 0) {
-          chosenAction = nonBuyActions[Math.floor(Math.random() * nonBuyActions.length)]
-        } else if (buyActions.length > 0) {
-          chosenAction = buyActions[Math.floor(Math.random() * buyActions.length)]
-        }
-
-        if (!chosenAction && possibleActions.length > 0) {
-          chosenAction = possibleActions[Math.floor(Math.random() * possibleActions.length)]
-        }
-
-        if (chosenAction) {
-          switch (chosenAction.type) {
-            case "buyReserved":
-              currentBotState = buyReservedCardLogic(currentBotState, 1, chosenAction.card)
-              botAction = `Bot membeli kartu cadangan ${chosenAction.card.provides} untuk ${chosenAction.card.points} poin`
-              cardBuySound.current?.play()
-              break
-            case "buyAvailable":
-              currentBotState = buyCardLogic(
-                currentBotState,
-                1,
-                chosenAction.card,
-                chosenAction.tier,
-                chosenAction.index,
-              )
-              botAction = `Bot membeli kartu ${chosenAction.card.provides} untuk ${chosenAction.card.points} poin`
-              cardBuySound.current?.play()
-              break
-            case "reserve":
-              currentBotState = reserveCardLogic(
-                currentBotState,
-                1,
-                chosenAction.card,
-                chosenAction.tier,
-                chosenAction.index,
-              )
-              botAction = `Bot menyimpan kartu ${chosenAction.card.provides} senilai ${chosenAction.card.points} poin`
-              cardReserveSound.current?.play()
-              break
-            case "takeGems":
-              currentBotState = takeGemsLogic(currentBotState, 1, chosenAction.selectedGems)
-              const takenColors = GEM_COLORS.filter((color) => chosenAction.selectedGems[color] > 0)
-              botAction = `Bot mengambil ${takenColors.map((color) => `${chosenAction.selectedGems[color]} ${color}`).join(", ")} permata`
-              gemCollectSound.current?.play()
-              break
-          }
-        } else {
-          botAction = "Bot melewati giliran"
-        }
-
-        const finalState = {
-          ...currentBotState,
-          botThinking: false,
-          botThinkingStage: "",
-          lastBotAction: botAction,
-          currentPlayer: (currentBotState.currentPlayer + 1) % 2,
-        }
-
-        if (finalState.animatingCard !== null) {
-          setTimeout(() => setGameState((current) => ({ ...current, animatingCard: null })), 500)
-        }
-        return finalState
-      })
-    }, 4000)
-  }, [gameState, gemCollectSound, cardBuySound, cardReserveSound, gameWinSound])
-
-  useEffect(() => {
-    if (gameState.gameMode === "pve" && gameState.currentPlayer === 1 && !gameState.winner && !gameState.botThinking) {
-      makeBotMove()
-    }
-  }, [gameState.currentPlayer, gameState.gameMode, gameState.winner, makeBotMove])
-
   const currentPlayer = gameState.players[gameState.currentPlayer] || gameState.players[0]
-  const currentPlayerBonuses = currentPlayer ? calculatePlayerBonuses(currentPlayer) : { white: 0, blue: 0, green: 0, red: 0, black: 0 }
-
-
-  const saveGameHistory = (gameState: GameState) => {
-    if (gameState.winner === null) return
-
-    const endTime = Date.now()
-    const duration = Math.floor((endTime - gameState.gameStartTime) / 1000)
-
-    const historyId = `game_${gameState.gameStartTime}_${gameState.winner}`
-
-    const existingHistory = getGameHistory()
-    const isDuplicate = existingHistory.some(game => game.id === historyId)
-
-    if (isDuplicate) {
-      console.log('Game already saved, skipping duplicate')
-      return
-    }
-
-    const history: GameHistory = {
-      id: historyId,
-      timestamp: endTime,
-      gameMode: gameState.gameMode as "pvp" | "pve",
-      players: gameState.players.map(player => ({
-        name: player.name,
-        isBot: player.isBot,
-        finalPoints: player.points,
-        finalCards: player.cards.length,
-        finalNobles: player.nobles.length,
-      })),
-      winner: {
-        id: gameState.winner,
-        name: gameState.players[gameState.winner].name,
-        points: gameState.players[gameState.winner].points,
-      },
-      duration,
-      totalTurns: gameState.turnCount,
-    }
-
-    const updatedHistory = [history, ...existingHistory]
-
-    const limitedHistory = updatedHistory.slice(0, 50)
-
-    localStorage.setItem('splendorGameHistory', JSON.stringify(limitedHistory))
-    console.log('Game saved to history:', historyId)
-  }
-
-  const getGameHistory = (): GameHistory[] => {
-    try {
-      const stored = localStorage.getItem('splendorGameHistory')
-      return stored ? JSON.parse(stored) : []
-    } catch (error) {
-      console.warn('Error loading game history:', error)
-      return []
-    }
-  }
-
-  const clearGameHistory = () => {
-    localStorage.removeItem('splendorGameHistory')
-  }
 
   if (gameState.gameMode === "menu") {
     return (
@@ -1049,7 +170,8 @@ export default function SplendorGame() {
                     className="space-y-6"
                     onSubmit={e => {
                       e.preventDefault()
-                      initializeGame("pve", nameInputs.p1)
+                      initializeGame("pve", nameInputs.p1 || "Kamu", "Bot")
+                      localStorage.setItem("splendorNames", JSON.stringify(nameInputs))
                     }}
                   >
                     <div className="text-center mb-4">
@@ -1094,7 +216,8 @@ export default function SplendorGame() {
                     className="space-y-6"
                     onSubmit={e => {
                       e.preventDefault()
-                      initializeGame("pvp", nameInputs.p1, nameInputs.p2)
+                      initializeGame("pvp", nameInputs.p1 || "Pemain 1", nameInputs.p2 || "Pemain 2")
+                      localStorage.setItem("splendorNames", JSON.stringify(nameInputs))
                     }}
                   >
                     <div className="text-center mb-4">
@@ -1170,46 +293,47 @@ export default function SplendorGame() {
     <div className="splendor-game-container">
       <BotNotification botNotif={botNotif} />
 
-      <div className="splendor-max-width splendor-space-y-4">
+      <div className="splendor-max-width splendor-space-y-1">
         <GameHeader
           gameState={gameState}
           currentPlayer={currentPlayer}
           setGameState={setGameState}
           setPendingMode={setPendingMode}
           initialGameState={initialGameState}
+          isSoundEnabled={isSoundEnabled}
+          toggleSound={toggleSound}
         />
 
-        <div className="splendor-main-grid">
+        <div className="splendor-main-grid gap-1 mt-4">
           <div className="splendor-col-left">
             <PlayerCard
               player={gameState.players[0]}
               isCurrentPlayer={gameState.currentPlayer === 0}
               canAffordCard={canAffordCard}
-              buyReservedCardLogic={buyReservedCardLogic}
-              setGameState={setGameState}
+              onBuyReservedCard={buyReservedCard}
               gameState={gameState}
               currentPlayer={currentPlayer}
+              className="flex-1"
             />
             <PlayerCard
               player={gameState.players[1]}
               isCurrentPlayer={gameState.currentPlayer === 1}
               canAffordCard={canAffordCard}
-              buyReservedCardLogic={buyReservedCardLogic}
-              setGameState={setGameState}
+              onBuyReservedCard={buyReservedCard}
               gameState={gameState}
               currentPlayer={currentPlayer}
+              className="flex-1"
             />
 
             <div className="splendor-hidden-lg">
               <GemSupply
                 gameState={gameState}
                 currentPlayer={currentPlayer}
-                setGameState={setGameState}
                 updateSelectedGems={updateSelectedGems}
                 canTakeSelectedGems={canTakeSelectedGems}
                 getTotalGems={getTotalGems}
-                takeGemsLogic={takeGemsLogic}
-                gemCollectSound={gemCollectSound}
+                onTakeGems={takeGems}
+                onClearSelectedGems={() => setGameState(prev => ({ ...prev, selectedGems: { white: 0, blue: 0, green: 0, red: 0, black: 0 } }))}
               />
             </div>
           </div>
@@ -1218,22 +342,20 @@ export default function SplendorGame() {
             <DevelopmentCardsBoard
               gameState={gameState}
               currentPlayer={currentPlayer}
-              setGameState={setGameState}
-              buyCardLogic={buyCardLogic}
-              reserveCardLogic={reserveCardLogic}
+              onBuyCard={buyCard}
+              onReserveCard={reserveCard}
               canAffordCard={canAffordCard}
             />
 
-            <div className="splendor-hidden-mobile mt-4">
+            <div className="splendor-hidden-mobile mt-1">
               <GemSupply
                 gameState={gameState}
                 currentPlayer={currentPlayer}
-                setGameState={setGameState}
                 updateSelectedGems={updateSelectedGems}
                 canTakeSelectedGems={canTakeSelectedGems}
                 getTotalGems={getTotalGems}
-                takeGemsLogic={takeGemsLogic}
-                gemCollectSound={gemCollectSound}
+                onTakeGems={takeGems}
+                onClearSelectedGems={() => setGameState(prev => ({ ...prev, selectedGems: { white: 0, blue: 0, green: 0, red: 0, black: 0 } }))}
               />
             </div>
           </div>

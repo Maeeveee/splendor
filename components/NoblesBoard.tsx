@@ -3,29 +3,32 @@ import { Crown } from "lucide-react"
 import NobleComponent from "./NobleComponent"
 
 const NoblesBoard = ({ gameState, currentPlayerBonuses }: any) => {
-  const humanPlayerBonuses = gameState.players[0] ? gameState.players[0].cards.reduce((bonuses: any, card: any) => {
-    bonuses[card.provides] = (bonuses[card.provides] || 0) + 1
-    return bonuses
-  }, { white: 0, blue: 0, green: 0, red: 0, black: 0 }) : { white: 0, blue: 0, green: 0, red: 0, black: 0 }
-
   return (
-    <Card className="shadow-lg bg-gradient-to-br from-white to-gray-50 h-fit">
-      <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2 text-lg">
-          <Crown className="w-5 h-5 text-yellow-600" />
-          Para Raja
+    <Card className="shadow-lg bg-gradient-to-br from-white to-gray-50 h-full">
+      <CardHeader className="pb-0.5 pt-1.5 px-1.5">
+        <CardTitle className="flex items-center gap-1.5 text-sm">
+          <Crown className="w-4 h-4 text-yellow-600" />
+          <span className="bg-gradient-to-r from-yellow-600 to-amber-600 bg-clip-text text-transparent font-bold">
+            Para Raja
+          </span>
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-3">
-        {gameState.availableNobles?.map((noble: any) => (
-          <div key={noble.id} className="w-full">
-            <NobleComponent 
-              noble={noble} 
-              playerBonuses={humanPlayerBonuses}
+      <CardContent className="p-1.5 h-full overflow-y-auto">
+        <div className="flex flex-col gap-1 h-full">
+          {gameState.availableNobles.map((noble: any) => (
+            <NobleComponent
+              key={noble.id}
+              noble={noble}
+              playerBonuses={currentPlayerBonuses.gems}
               layout="vertical"
             />
-          </div>
-        ))}
+          ))}
+          {gameState.availableNobles.length === 0 && (
+            <div className="text-center text-gray-400 text-xs py-4 italic">
+              Tidak ada bangsawan tersisa
+            </div>
+          )}
+        </div>
       </CardContent>
     </Card>
   )

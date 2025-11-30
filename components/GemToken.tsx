@@ -30,14 +30,15 @@ const GemToken = ({
   color,
   count,
   size = "normal",
-}: { 
-  color: string; 
-  count?: number; 
-  size?: "small" | "normal" | "large" 
+}: {
+  color: string;
+  count?: number;
+  size?: "tiny" | "small" | "medium" | "normal" | "large"
 }) => {
   const sizeClasses = {
-    tiny: "w-3 h-3 text-xs",
+    tiny: "w-4 h-4 text-[10px]",
     small: "w-5 h-5 text-xs",
+    medium: "w-6 h-6 text-xs",
     normal: "w-8 h-8 text-sm",
     large: "w-10 h-10 text-base",
   }
@@ -56,7 +57,7 @@ const GemToken = ({
 
   return (
     <div
-      className={`${sizeClasses[size]} rounded-full border-2 ${getGemColor(color)} flex items-center justify-center font-bold shadow-md transition-all duration-300 hover:scale-110`}
+      className={`${sizeClasses[size]} rounded-full border-2 ${getGemColor(color)} flex items-center justify-center font-bold shadow-md transition-all duration-300 hover:scale-110 ${flash ? "scale-125 ring-2 ring-yellow-400" : ""}`}
     >
       {count !== undefined && count > 0 ? count : getGemIcon(color)}
     </div>

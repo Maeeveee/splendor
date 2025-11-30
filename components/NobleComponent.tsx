@@ -8,11 +8,11 @@ const NobleGemToken = ({ color, count, size = "small" }: any) => {
   const getSize = () => {
     switch (size) {
       case "tiny":
-        return "w-4 h-6 text-xs"
+        return "w-3 h-4 text-[8px]"
       case "small":
-        return "w-6 h-8 text-xs"
+        return "w-4 h-6 text-[10px]"
       default:
-        return "w-6 h-8 text-xs"
+        return "w-4 h-6 text-[10px]"
     }
   }
 
@@ -56,20 +56,20 @@ const NobleComponent = ({ noble, playerBonuses, layout = "horizontal" }: any) =>
         w-full
       `}
       >
-        <CardContent className="p-3">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2">
-              <Crown className="w-5 h-5 text-yellow-600" />
+        <CardContent className="p-2">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-1">
+              <Crown className="w-4 h-4 text-yellow-600" />
             </div>
-            <Badge className="bg-yellow-100 text-yellow-800 border-yellow-300">
-              <Star className="w-3 h-3 mr-1" />
+            <Badge className="bg-yellow-100 text-yellow-800 border-yellow-300 px-1 py-0">
+              <Star className="w-2.5 h-2.5 mr-0.5" />
               {noble.points}
             </Badge>
           </div>
 
-          <div className="space-y-2">
-            <div className="text-xs text-gray-600 font-medium">Kartu dibutuhkan:</div>
-            <div className="grid grid-cols-5 gap-1">
+          <div className="space-y-1">
+            <div className="text-[10px] text-gray-600 font-medium">Kartu dibutuhkan:</div>
+            <div className="grid grid-cols-5 gap-0.5">
               {GEM_COLORS.map((color) => {
                 const required = noble.requirements[color]
                 const playerHas = playerBonuses[color]
@@ -80,9 +80,8 @@ const NobleComponent = ({ noble, playerBonuses, layout = "horizontal" }: any) =>
                   <div key={color} className="flex flex-col items-center">
                     <NobleGemToken color={color} count={required} size="small" />
                     <div
-                      className={`text-xs mt-1 ${
-                        playerHas >= required ? "text-green-600 font-bold" : "text-red-500"
-                      }`}
+                      className={`text-[10px] mt-0.5 ${playerHas >= required ? "text-green-600 font-bold" : "text-red-500"
+                        }`}
                     >
                       {playerHas}/{required}
                     </div>
@@ -93,9 +92,9 @@ const NobleComponent = ({ noble, playerBonuses, layout = "horizontal" }: any) =>
           </div>
 
           {canVisit && (
-            <div className="mt-3 text-center">
-              <div className="text-xs text-yellow-700 font-bold animate-pulse">
-                ✨ Anda dapat mengunjungi Noble ini!
+            <div className="mt-2 text-center">
+              <div className="text-[10px] text-yellow-700 font-bold animate-pulse">
+                ✨ Bisa dikunjungi!
               </div>
             </div>
           )}
@@ -109,21 +108,21 @@ const NobleComponent = ({ noble, playerBonuses, layout = "horizontal" }: any) =>
       className={`
       ${canVisit ? "ring-2 ring-yellow-400 bg-yellow-50" : "bg-white"}
       shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-105
-      w-32 h-40 flex-shrink-0
+      w-24 h-32 flex-shrink-0
     `}
     >
-      <CardContent className="p-3 h-full flex flex-col">
-        <div className="flex items-center justify-between mb-2">
-          <Crown className="w-4 h-4 text-yellow-600" />
-          <Badge className="bg-yellow-100 text-yellow-800 border-yellow-300 text-xs">
-            <Star className="w-2 h-2 mr-1" />
+      <CardContent className="p-2 h-full flex flex-col">
+        <div className="flex items-center justify-between mb-1">
+          <Crown className="w-3 h-3 text-yellow-600" />
+          <Badge className="bg-yellow-100 text-yellow-800 border-yellow-300 text-[10px] px-1 py-0">
+            <Star className="w-2 h-2 mr-0.5" />
             {noble.points}
           </Badge>
         </div>
 
         <div className="flex-1 flex flex-col justify-center">
-          <div className="text-xs text-gray-600 mb-2">Butuh (You):</div>
-          <div className="grid grid-cols-2 gap-1">
+          <div className="text-[10px] text-gray-600 mb-1">Butuh (You):</div>
+          <div className="grid grid-cols-2 gap-0.5">
             {GEM_COLORS.map((color) => {
               const required = noble.requirements[color]
               const playerHas = playerBonuses[color]
@@ -133,7 +132,7 @@ const NobleComponent = ({ noble, playerBonuses, layout = "horizontal" }: any) =>
               return (
                 <div key={color} className="flex flex-col items-center">
                   <NobleGemToken color={color} count={required} size="tiny" />
-                  <div className={`text-xs mt-1 ${playerHas >= required ? "text-green-600" : "text-red-500"}`}>
+                  <div className={`text-[10px] mt-0.5 ${playerHas >= required ? "text-green-600" : "text-red-500"}`}>
                     {playerHas}/{required}
                   </div>
                 </div>
@@ -143,8 +142,8 @@ const NobleComponent = ({ noble, playerBonuses, layout = "horizontal" }: any) =>
         </div>
 
         {canVisit && (
-          <div className="text-center mt-2">
-            <div className="text-xs text-yellow-700 font-bold">✨</div>
+          <div className="text-center mt-1">
+            <div className="text-[10px] text-yellow-700 font-bold">✨</div>
           </div>
         )}
       </CardContent>
